@@ -12,12 +12,12 @@ yarn start:dev
 **結果:** 正常に起動し、ファイル監視モードで動作
 
 ### 2. **Hello World APIの動作確認**
-- **URL**: http://localhost:3001
+- **URL**: http://localhost:3000
 - **結果**: "Hello World!" が表示される
 - **ステータス**: ✅ 成功
 
 ### 3. **開発環境の確認**
-- **ポート**: 3001（3000が使用中だったため変更）
+- **ポート**: 3000
 - **ファイル監視**: 有効
 - **自動再起動**: 有効
 
@@ -26,17 +26,17 @@ yarn start:dev
 ### ポート変更の対応
 ```typescript
 // src/main.ts
-await app.listen(process.env.PORT ?? 3001);
+await app.listen(process.env.PORT ?? 3000);
 ```
 
 ### プロセス確認
 ```bash
-lsof -i :3001  # ポート3001の使用状況確認
+lsof -i :3000  # ポート3000の使用状況確認
 ps aux | grep node  # Node.jsプロセスの確認
 ```
 
 ### ブラウザでの確認
-- http://localhost:3001 にアクセス
+- http://localhost:3000 にアクセス
 - "Hello World!" が正常に表示
 
 ## 💡 学んだこと
@@ -53,7 +53,7 @@ ps aux | grep node  # Node.jsプロセスの確認
 
 ### 3. **HTTP vs HTTPS**
 - ローカル開発ではHTTPを使用
-- `http://localhost:3001` でアクセス
+- `http://localhost:3000` でアクセス
 - HTTPSは本番環境で使用
 
 ## 🔧 技術的な詳細
@@ -63,7 +63,7 @@ ps aux | grep node  # Node.jsプロセスの確認
 2. NestJS CLIが起動
 3. TypeScriptコンパイル
 4. HTTPサーバー起動
-5. ポート3001でリッスン開始
+5. ポート3000でリッスン開始
 
 ### ファイル構造
 ```

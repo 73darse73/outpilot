@@ -1,98 +1,214 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🧠 Outpilot - NestJS バックエンド学習プロジェクト
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 🎯 プロジェクト概要
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+ChatGPTで調べた内容を、**特定のキーワードに反応して自動で要約**し、
+ユーザーが「OK」と返すと**Notionに保存**できるアプリです。
 
-## Description
+**このプロジェクトはバックエンド学習が主目的です。**
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+将来的には、**ブログ化・スライド化などのアウトプット**にも活用できるよう拡張予定です。
 
-## Project setup
+---
 
-```bash
-$ pnpm install
+## 🎓 学習目標
+
+### バックエンド開発の基本概念
+- [ ] HTTP通信の仕組み
+- [ ] RESTful APIの設計
+- [ ] データベース操作（Prisma）
+- [ ] 認証・認可の実装
+- [ ] 外部APIとの連携
+- [ ] エラーハンドリング
+- [ ] テストの書き方
+
+### NestJSフレームワーク
+- [ ] モジュール・コントローラー・サービス
+- [ ] 依存性注入（DI）
+- [ ] デコレータの使い方
+- [ ] ミドルウェア・ガード・インターセプター
+- [ ] バリデーション（class-validator）
+- [ ] Swagger API文書
+
+---
+
+## 🔧 使用技術スタック
+
+| 分類      | 技術                                                         |
+| ------- | ---------------------------------------------------------- |
+| フレームワーク | [NestJS](https://nestjs.com/)（TypeScriptファーストのバックエンドフレームワーク） |
+| ORM     | [Prisma](https://www.prisma.io/)                           |
+| データベース  | PostgreSQL（Docker ローカル開発）                                  |
+| AI      | OpenAI API（`gpt-4-turbo` 使用）                               |
+| 外部API   | Notion API（アウトプット保存）                                       |
+| 認証     | JWT（JSON Web Token）                                           |
+| バリデーション | class-validator + class-transformer                           |
+| API文書  | Swagger/OpenAPI                                              |
+
+---
+
+## 🛠 機能一覧
+
+### 🔸 Chat機能
+* ChatGPTに対して質問を投げる
+* レスポンスをログとしてDBに保存
+
+### 🔸 要約トリガー機能
+* チャットに`#まとめて`などの特定キーワードが含まれると、スレッド全体をGPTで要約
+* 要約結果を表示（保存前）
+
+### 🔸 承認 → 保存機能
+* ユーザーが「OK」と返すと、要約結果をNotionに保存
+
+### 🔸 Notion保存機能
+* タイトル・本文・タグなどを含む構造で、自分のNotionデータベースにページ保存
+
+---
+
+## 🧱 データ構造（Prisma スキーマ）
+
+```prisma
+model Thread {
+  id        String    @id @default(cuid())
+  title     String?
+  createdAt DateTime  @default(now())
+  messages  Message[]
+  summary   Summary?
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  threadId  String
+  role      String   // 'user' or 'assistant'
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Summary {
+  id            String   @id @default(cuid())
+  thread        Thread   @relation(fields: [threadId], references: [id])
+  threadId      String   @unique
+  content       String
+  savedToNotion Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
 ```
 
-## Compile and run the project
+---
+
+## 🚀 セットアップ手順
+
+### 1. 依存関係のインストール
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+$ yarn install
 ```
 
-## Run tests
+### 2. 環境変数の設定
+
+`.env`ファイルを作成し、以下の環境変数を設定してください：
+
+```env
+# OpenAI API
+OPENAI_API_KEY=your_openai_api_key
+
+# Notion API
+NOTION_API_KEY=your_notion_api_key
+NOTION_DATABASE_ID=your_notion_database_id
+
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/outpilot"
+
+# JWT Secret
+JWT_SECRET=your_jwt_secret_key
+```
+
+### 3. データベースのセットアップ
 
 ```bash
-# unit tests
-$ pnpm run test
+# Prismaクライアントの生成
+$ npx prisma generate
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# データベースのマイグレーション
+$ npx prisma db push
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 4. 開発サーバーの起動
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# 開発モードで起動
+$ yarn start:dev
+
+# 本番ビルド
+$ yarn build
+$ yarn start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📝 API エンドポイント
 
-Check out a few resources that may come in handy when working with NestJS:
+### スレッド関連
+- `POST /api/threads` - 新しいスレッドを作成
+- `GET /api/threads` - スレッド一覧を取得
+- `GET /api/threads/:id` - 特定のスレッドを取得
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### メッセージ関連
+- `POST /api/messages` - 新しいメッセージを送信（ChatGPT応答付き）
+- `GET /api/messages/thread/:threadId` - スレッドのメッセージ一覧を取得
 
-## Support
+### 要約関連
+- `POST /api/summaries` - スレッドの要約を作成
+- `POST /api/summaries/:id/save-to-notion` - 要約をNotionに保存
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 認証関連
+- `POST /api/auth/login` - ユーザーログイン
+- `POST /api/auth/register` - ユーザー登録
+- `GET /api/auth/profile` - プロフィール取得
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🔑 必要なAPIキー
 
-## License
+### OpenAI API
+1. [OpenAI Platform](https://platform.openai.com/)にアクセス
+2. APIキーを生成
+3. 環境変数`OPENAI_API_KEY`に設定
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Notion API
+1. [Notion Developers](https://developers.notion.com/)にアクセス
+2. 新しいインテグレーションを作成
+3. APIキーを取得し、環境変数`NOTION_API_KEY`に設定
+4. データベースIDを取得し、環境変数`NOTION_DATABASE_ID`に設定
+5. データベースにインテグレーションを追加
+
+---
+
+## 🎨 今後の拡張予定
+
+- [ ] フロントエンド（React/Vue.js）の実装
+- [ ] ブログ記事自動生成機能
+- [ ] スライド資料自動生成機能
+- [ ] 複数のアウトプット形式対応
+- [ ] ユーザー認証機能
+- [ ] チーム機能
+- [ ] リアルタイム通信（WebSocket）
+
+---
+
+## 📄 ライセンス
+
+MIT License
+
+---
+
+## 🤝 コントリビューション
+
+プルリクエストやイシューの報告を歓迎します！
+
+1. このリポジトリをフォーク
+2. 新しいブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成

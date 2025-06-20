@@ -65,3 +65,24 @@
   - `prisma/schema.prisma` が生成され、`provider = "postgresql"` になっている
   - `.env` ファイルが生成され、`DATABASE_URL` のテンプレが入っている
   - これでPostgreSQL用のDB設計・マイグレーションがすぐ始められる状態になった
+
+- **次のステップ**: スキーマ設計・マイグレーション
+
+### Prismaスキーマ設計
+- **設計方針**: 自分だけが使うことを前提にシンプルな構成
+- **モデル構成**:
+  - `Thread` - チャットスレッド（id, title, createdAt, updatedAt）
+  - `Message` - チャットメッセージ（id, content, role, threadId, createdAt）
+  - `Summary` - 要約データ（id, title, content, threadId, status, notionUrl, createdAt, updatedAt）
+- **リレーション**: Thread (1) ←→ (多) Message, Thread (1) ←→ (多) Summary
+- **Userモデルは削除**: 自分だけが使うため不要
+- **理由**: シンプルな構成で開発を進めやすくする
+
+### Gitブランチ戦略
+- **mainブランチ**: NestJSプロジェクト作成 + Prisma初期設定まで完了
+- **feature/prisma-setupブランチ**: スキーマ設計・マイグレーション作業
+- **今後の予定**:
+  - feature/user-model - UserモデルとAPI実装
+  - feature/chat-function - チャット機能
+  - feature/summary-function - 要約機能
+- **理由**: 機能ごとにブランチを分けることで、作業履歴を整理し、必要に応じて特定の機能だけをリバートできる

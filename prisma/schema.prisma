@@ -13,3 +13,48 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// チャットスレッドモデル
+model Thread {
+  id          Int       @id @default(autoincrement())
+  title       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // リレーション
+  messages   Message[]
+  summaries  Summary[]
+
+  @@map("threads")
+}
+
+// チャットメッセージモデル
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  role      String   // "user" | "assistant"
+  threadId  Int
+  createdAt DateTime @default(now())
+
+  // リレーション
+  thread    Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+// 要約モデル
+model Summary {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  threadId    Int
+  status      String   @default("pending") // "pending" | "approved" | "saved"
+  notionUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // リレーション
+  thread     Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("summaries")
+}

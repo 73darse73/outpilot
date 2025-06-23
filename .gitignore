@@ -59,3 +59,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Personal learning logs
 DONE_LOG.md
+LEARNING_LOG.md
+
+# Cursor
+.cursor/

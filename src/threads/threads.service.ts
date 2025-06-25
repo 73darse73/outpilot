@@ -7,7 +7,7 @@ export class ThreadsService {
 
   async create(title: string) {
     return this.prisma.thread.create({
-      data: { title }
+      data: { title },
     });
   }
 
@@ -17,13 +17,13 @@ export class ThreadsService {
         _count: {
           select: {
             messages: true,
-            summaries: true
-          }
-        }
+            summaries: true,
+          },
+        },
       },
       orderBy: {
-        updatedAt: 'desc'
-      }
+        updatedAt: 'desc',
+      },
     });
   }
 
@@ -33,28 +33,28 @@ export class ThreadsService {
       include: {
         messages: {
           orderBy: {
-            createdAt: 'asc'
-          }
+            createdAt: 'asc',
+          },
         },
         summaries: {
           orderBy: {
-            createdAt: 'desc'
-          }
-        }
-      }
+            createdAt: 'desc',
+          },
+        },
+      },
     });
   }
 
   async update(id: number, title: string) {
     return this.prisma.thread.update({
       where: { id },
-      data: { title }
+      data: { title },
     });
   }
 
   async remove(id: number) {
     return this.prisma.thread.delete({
-      where: { id }
+      where: { id },
     });
   }
-} 
+}

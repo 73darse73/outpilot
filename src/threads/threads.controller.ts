@@ -12,6 +12,8 @@ import {
 import { ThreadsService } from './threads.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { ThreadDto, ThreadDetailDto } from './dto/thread.dto';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { MessageDto } from './dto/message.dto';
 
 @Controller('threads')
 export class ThreadsController {
@@ -57,5 +59,28 @@ export class ThreadsController {
     } catch {
       throw new NotFoundException(`Thread with ID ${id} not found`);
     }
+  }
+
+  @Post(':id/messages')
+  async createMessage(
+    @Param('id', ParseIntPipe) threadId: number,
+    @Body() createMessageDto: CreateMessageDto,
+  ): Promise<MessageDto> {
+    return this.threadsService.createMessage(threadId, createMessageDto);
+  }
+
+  @Get(':id/messages')
+  async findMessages(
+    @Param('id', ParseIntPipe) threadId: number,
+  ): Promise<MessageDto[]> {
+    return this.threadsService.findMessages(threadId);
+  }
+
+  @Get(':threadId/messages/:messageId')
+  async findMessage(
+    @Param('threadId', ParseIntPipe) threadId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+  ): Promise<MessageDto> {
+    return this.threadsService.findMessage(threadId, messageId);
   }
 }

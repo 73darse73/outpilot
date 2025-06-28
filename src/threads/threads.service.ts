@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMessageDto, MessageRole } from './dto/create-message.dto';
+import { CreateSummaryDto, SummaryStatus } from './dto/create-summary.dto';
 
 @Injectable()
 export class ThreadsService {
@@ -120,6 +121,75 @@ export class ThreadsService {
     return {
       ...message,
       role: message.role as MessageRole,
+    };
+  }
+
+  // サマリーを作成
+  async createSummary(threadId: number, createSummaryDto: CreateSummaryDto) {
+    // スレッドの存在確認
+    const thread = await this.prisma.thread.findUnique({
+      where: { id: threadId },
+    });
+
+    if (!thread) {
+      throw new NotFoundException(`Thread with ID ${threadId} not found`);
+    }
+
+    // サマリーを作成
+    const summary = await this.prisma.summary.create({
+      data: {
+        ...createSummaryDto,
+        threadId,
+      },
+    });
+
+    return {
+      ...summary,
+      status: summary.status as SummaryStatus,
+    };
+  }
+
+  // スレッドのサマリー一覧を取得
+  async findSummaries(threadId: number) {
+    // スレッドの存在確認
+    const thread = await this.prisma.thread.findUnique({
+      where: { id: threadId },
+    });
+
+    if (!thread) {
+      throw new NotFoundException(`Thread with ID ${threadId} not found`);
+    }
+
+    // サマリー一覧を取得
+    const summaries = await this.prisma.summary.findMany({
+      where: { threadId },
+      orderBy: { createdAt: 'desc' }, // 新しい順
+    });
+
+    return summaries.map((summary) => ({
+      ...summary,
+      status: summary.status as SummaryStatus,
+    }));
+  }
+
+  // 特定のサマリーを取得
+  async findSummary(threadId: number, summaryId: number) {
+    const summary = await this.prisma.summary.findFirst({
+      where: {
+        id: summaryId,
+        threadId,
+      },
+    });
+
+    if (!summary) {
+      throw new NotFoundException(
+        `Summary with ID ${summaryId} not found in thread ${threadId}`,
+      );
+    }
+
+    return {
+      ...summary,
+      status: summary.status as SummaryStatus,
     };
   }
 }

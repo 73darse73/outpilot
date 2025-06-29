@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMessageDto, MessageRole } from './dto/create-message.dto';
 import { CreateSummaryDto, SummaryStatus } from './dto/create-summary.dto';
+import { UpdateSummaryDto } from './dto/update-summary.dto';
 
 @Injectable()
 export class ThreadsService {
@@ -190,6 +191,49 @@ export class ThreadsService {
     return {
       ...summary,
       status: summary.status as SummaryStatus,
+    };
+  }
+
+  // サマリーを更新
+  async updateSummary(
+    threadId: number,
+    summaryId: number,
+    updateSummaryDto: UpdateSummaryDto,
+  ) {
+    // スレッドの存在確認
+    const thread = await this.prisma.thread.findUnique({
+      where: { id: threadId },
+    });
+
+    if (!thread) {
+      throw new NotFoundException(`Thread with ID ${threadId} not found`);
+    }
+
+    // サマリーの存在確認
+    const summary = await this.prisma.summary.findFirst({
+      where: {
+        id: summaryId,
+        threadId,
+      },
+    });
+
+    if (!summary) {
+      throw new NotFoundException(
+        `Summary with ID ${summaryId} not found in thread ${threadId}`,
+      );
+    }
+
+    // サマリーを更新
+    const updatedSummary = await this.prisma.summary.update({
+      where: {
+        id: summaryId,
+      },
+      data: updateSummaryDto,
+    });
+
+    return {
+      ...updatedSummary,
+      status: updatedSummary.status as SummaryStatus,
     };
   }
 }

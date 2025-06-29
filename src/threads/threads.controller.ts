@@ -14,6 +14,9 @@ import { CreateThreadDto } from './dto/create-thread.dto';
 import { ThreadDto, ThreadDetailDto } from './dto/thread.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageDto } from './dto/message.dto';
+import { CreateSummaryDto } from './dto/create-summary.dto';
+import { SummaryDto } from './dto/summary.dto';
+import { UpdateSummaryDto } from './dto/update-summary.dto';
 
 @Controller('threads')
 export class ThreadsController {
@@ -82,5 +85,33 @@ export class ThreadsController {
     @Param('messageId', ParseIntPipe) messageId: number,
   ): Promise<MessageDto> {
     return this.threadsService.findMessage(threadId, messageId);
+  }
+
+  @Post(':id/summaries')
+  async createSummary(
+    @Param('id', ParseIntPipe) threadId: number,
+    @Body() createSummaryDto: CreateSummaryDto,
+  ): Promise<SummaryDto> {
+    return this.threadsService.createSummary(threadId, createSummaryDto);
+  }
+
+  @Get(':id/summaries')
+  async findSummaries(
+    @Param('id', ParseIntPipe) threadId: number,
+  ): Promise<SummaryDto[]> {
+    return this.threadsService.findSummaries(threadId);
+  }
+
+  @Patch(':threadId/summaries/:summaryId')
+  async updateSummary(
+    @Param('threadId', ParseIntPipe) threadId: number,
+    @Param('summaryId', ParseIntPipe) summaryId: number,
+    @Body() updateSummaryDto: UpdateSummaryDto,
+  ): Promise<SummaryDto> {
+    return this.threadsService.updateSummary(
+      threadId,
+      summaryId,
+      updateSummaryDto,
+    );
   }
 }

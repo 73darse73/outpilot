@@ -1,12 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { OpenAIService } from '../openai/openai.service';
 import { CreateMessageDto, MessageRole } from './dto/create-message.dto';
 import { CreateSummaryDto, SummaryStatus } from './dto/create-summary.dto';
 import { UpdateSummaryDto } from './dto/update-summary.dto';
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 @Injectable()
 export class ThreadsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private openaiService: OpenAIService,
+  ) {}
 
   async create(title: string) {
     return this.prisma.thread.create({
@@ -78,10 +83,50 @@ export class ThreadsService {
       },
     });
 
+    // ユーザーメッセージの場合、AI応答を生成
+    if (createMessageDto.role === MessageRole.USER) {
+      await this.generateAIResponse(threadId);
+    }
+
     return {
       ...message,
       role: message.role as MessageRole,
     };
+  }
+
+  // AI応答を生成するメソッド
+  async generateAIResponse(threadId: number) {
+    try {
+      // スレッドの全メッセージを取得
+      const messages = await this.prisma.message.findMany({
+        where: { threadId },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      // OpenAI API用のメッセージ形式に変換
+      const openaiMessages: ChatCompletionMessageParam[] = messages.map(
+        (msg) => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+        }),
+      );
+
+      // AI応答を生成
+      const aiResponse =
+        await this.openaiService.generateResponse(openaiMessages);
+
+      // AI応答をデータベースに保存
+      await this.prisma.message.create({
+        data: {
+          content: aiResponse,
+          role: 'assistant',
+          threadId,
+        },
+      });
+    } catch (error) {
+      console.error('AI応答生成エラー:', error);
+      // エラーが発生してもユーザーメッセージの保存は成功させる
+    }
   }
 
   async findMessages(threadId: number) {

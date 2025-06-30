@@ -95,6 +95,14 @@ export class ThreadsController {
     return this.threadsService.createSummary(threadId, createSummaryDto);
   }
 
+  @Post(':id/ai-response')
+  async generateAIResponse(
+    @Param('id', ParseIntPipe) threadId: number,
+  ): Promise<{ message: string }> {
+    await this.threadsService.generateAIResponse(threadId);
+    return { message: 'AI応答を生成しました' };
+  }
+
   @Get(':id/summaries')
   async findSummaries(
     @Param('id', ParseIntPipe) threadId: number,

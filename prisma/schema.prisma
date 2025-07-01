@@ -24,6 +24,7 @@ model Thread {
   // リレーション
   messages   Message[]
   summaries  Summary[]
+  slides     Slide[]
 
   @@map("threads")
 }
@@ -57,4 +58,19 @@ model Summary {
   thread     Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
   @@map("summaries")
+}
+
+// スライドモデル（新規追加）
+model Slide {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String   @db.Text  // Marp Markdown
+  threadId    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // リレーション
+  thread      Thread?  @relation(fields: [threadId], references: [id], onDelete: SetNull)
+
+  @@map("slides")
 }

@@ -17,10 +17,15 @@ import { MessageDto } from './dto/message.dto';
 import { CreateSummaryDto } from './dto/create-summary.dto';
 import { SummaryDto } from './dto/summary.dto';
 import { UpdateSummaryDto } from './dto/update-summary.dto';
+import { SlidesService } from '../slides/slides.service';
+import { SlideDto } from '../slides/slide.dto';
 
 @Controller('threads')
 export class ThreadsController {
-  constructor(private readonly threadsService: ThreadsService) {}
+  constructor(
+    private readonly threadsService: ThreadsService,
+    private readonly slidesService: SlidesService,
+  ) {}
 
   @Post()
   async create(@Body() createThreadDto: CreateThreadDto): Promise<ThreadDto> {
@@ -101,6 +106,13 @@ export class ThreadsController {
   ): Promise<{ message: string }> {
     await this.threadsService.generateAIResponse(threadId);
     return { message: 'AI応答を生成しました' };
+  }
+
+  @Post(':id/generate-slide')
+  async generateSlide(
+    @Param('id', ParseIntPipe) threadId: number,
+  ): Promise<SlideDto> {
+    return this.slidesService.generateFromThread(threadId);
   }
 
   @Get(':id/summaries')

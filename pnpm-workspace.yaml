@@ -1,0 +1,11 @@
+packages:
+  - backend
+  - frontend
+ignoredBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@swc/core'
+  - '@tailwindcss/oxide'
+  - prisma
+  - unrs-resolver

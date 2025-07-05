@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { Message as MessageComponent } from '../components/Message';
+import { type Message } from '../types';
 
 export default function ThreadPage({ params }: { params: { id: string } }) {
   const [newMessage, setNewMessage] = useState('');
@@ -12,44 +14,43 @@ export default function ThreadPage({ params }: { params: { id: string } }) {
     setNewMessage('');
   };
 
+  // 仮のメッセージデータ
+  const messages: Message[] = [
+    {
+      id: 1,
+      role: 'user',
+      type: 'text',
+      content: 'こんにちは！スライドを作りたいです。',
+    },
+    {
+      id: 2,
+      role: 'assistant',
+      type: 'text',
+      content:
+        'はい、お手伝いさせていただきます。\nどんなスライドを作りたいですか？',
+    },
+    {
+      id: 3,
+      role: 'user',
+      type: 'text',
+      content: '会社の新製品のプレゼン資料です。',
+    },
+    {
+      id: 4,
+      role: 'assistant',
+      type: 'code',
+      language: 'typescript',
+      content:
+        'interface Product {\n  name: string;\n  features: string[];\n  price: number;\n}',
+    },
+  ];
+
   return (
     <div className="h-full flex flex-col">
       {/* メッセージ履歴 */}
       <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-        {/* 仮のメッセージデータ */}
-        {[
-          {
-            id: 1,
-            role: 'user',
-            content: 'こんにちは！スライドを作りたいです。',
-          },
-          {
-            id: 2,
-            role: 'assistant',
-            content:
-              'はい、お手伝いさせていただきます。どんなスライドを作りたいですか？',
-          },
-          { id: 3, role: 'user', content: '会社の新製品のプレゼン資料です。' },
-        ].map((message) => (
-          <div
-            key={message.id}
-            className={`
-              flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}
-            `}
-          >
-            <div
-              className={`
-              max-w-[80%] rounded-lg p-4
-              ${
-                message.role === 'user'
-                  ? 'bg-blue-500 text-white dark:bg-blue-600'
-                  : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
-              }
-            `}
-            >
-              {message.content}
-            </div>
-          </div>
+        {messages.map((message) => (
+          <MessageComponent key={message.id} message={message} />
         ))}
       </div>
 

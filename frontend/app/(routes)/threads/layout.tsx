@@ -5,9 +5,9 @@ import Link from 'next/link';
 
 export default function ThreadsLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -23,7 +23,6 @@ export default function ThreadsLayout({
       `}
       >
         <div className="w-64 h-full">
-          {' '}
           {/* 固定幅のコンテナ */}
           <div className="p-4">
             <Link
@@ -35,7 +34,10 @@ export default function ThreadsLayout({
           </div>
           <div className="overflow-y-auto h-[calc(100%-5rem)]">
             {/* 仮のスレッド一覧 */}
-            {[1, 2, 3].map((id) => (
+            {[
+              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+              20,
+            ].map((id) => (
               <Link
                 key={id}
                 href={`/threads/${id}`}

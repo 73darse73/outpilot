@@ -108,6 +108,14 @@ export class ThreadsController {
     return { message: 'AI応答を生成しました' };
   }
 
+  @Post('generate-title')
+  async generateTitle(
+    @Body() body: { content: string },
+  ): Promise<{ title: string }> {
+    const title = await this.threadsService.generateTitle(body.content);
+    return { title };
+  }
+
   @Post(':id/generate-slide')
   async generateSlide(
     @Param('id', ParseIntPipe) threadId: number,

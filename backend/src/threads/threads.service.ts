@@ -281,4 +281,25 @@ export class ThreadsService {
       status: updatedSummary.status as SummaryStatus,
     };
   }
+
+  // タイトルを生成するメソッド
+  async generateTitle(content: string): Promise<string> {
+    try {
+      const prompt = `以下の内容に基づいて、簡潔で分かりやすいタイトルを生成してください。タイトルは20文字以内で、日本語でお願いします。
+
+内容: ${content}
+
+タイトル:`;
+
+      const title = await this.openaiService.generateResponse([
+        { role: 'user', content: prompt },
+      ]);
+
+      // 余分な改行や空白を削除
+      return title.trim().replace(/\n/g, '');
+    } catch (error) {
+      console.error('タイトル生成エラー:', error);
+      return '新規チャット';
+    }
+  }
 }

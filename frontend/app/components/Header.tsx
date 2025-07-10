@@ -6,6 +6,11 @@ import { usePathname } from 'next/navigation';
 export function Header() {
   const pathname = usePathname();
 
+  // スレッドページではヘッダーを非表示
+  if (pathname.startsWith('/threads')) {
+    return null;
+  }
+
   const navigation = [
     { name: '記事', href: '/articles' },
     { name: 'プロジェクト', href: '/projects' },

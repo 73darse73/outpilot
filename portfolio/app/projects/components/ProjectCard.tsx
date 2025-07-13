@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -27,11 +28,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       {/* プロジェクト画像 */}
       {project.imageUrl && (
-        <div className="h-48 bg-gray-200 dark:bg-gray-700">
-          <img
+        <div className="h-48 bg-gray-200 dark:bg-gray-700 relative">
+          <Image
             src={project.imageUrl}
             alt={project.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         </div>
       )}

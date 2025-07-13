@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import TitleBackground from '../components/TitleBackground';
+import PageTransition from '../components/PageTransition';
 // import ContactBackground from '../components/ContactBackground';
 
 export default function ContactPage() {
@@ -113,253 +114,258 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen bg-transparent">
-      {/* シンプルな2Dグラデーション背景 */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-400 via-purple-400 to-indigo-600 opacity-80" />
-      <Navigation />
+    <PageTransition>
+      <main className="min-h-screen bg-transparent">
+        {/* シンプルな2Dグラデーション背景 */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-400 via-purple-400 to-indigo-600 opacity-80" />
+        <Navigation />
 
-      {/* ヒーローセクション */}
-      <section className="pt-20 pb-16 bg-transparent relative overflow-hidden">
-        <TitleBackground />
-        <div className="max-w-4xl mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              Contact
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              お仕事のご依頼や技術相談など、お気軽にお声がけください
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* メインコンテンツ */}
-      <section className="py-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* お問い合わせフォーム */}
+        {/* ヒーローセクション */}
+        <section className="pt-20 pb-16 bg-transparent relative overflow-hidden">
+          <TitleBackground />
+          <div className="max-w-4xl mx-auto px-4 relative z-10">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
+              className="text-center"
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-                お問い合わせフォーム
-              </h2>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    お名前 *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    placeholder="山田太郎"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    メールアドレス *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    placeholder="example@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="subject"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    件名 *
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  >
-                    <option value="">選択してください</option>
-                    <option value="project">プロジェクトのご相談</option>
-                    <option value="consulting">技術コンサルティング</option>
-                    <option value="collaboration">共同開発のお誘い</option>
-                    <option value="other">その他</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    メッセージ *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
-                    placeholder="プロジェクトの詳細やご要望をお聞かせください"
-                  />
-                </div>
-
-                <motion.button
-                  type="submit"
-                  disabled={isSubmitting}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {isSubmitting ? '送信中...' : '送信する'}
-                </motion.button>
-
-                {/* 送信ステータス */}
-                {submitStatus === 'success' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg"
-                  >
-                    お問い合わせありがとうございます。後日ご連絡いたします。
-                  </motion.div>
-                )}
-
-                {submitStatus === 'error' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg"
-                  >
-                    送信に失敗しました。しばらく時間をおいて再度お試しください。
-                  </motion.div>
-                )}
-              </form>
-            </motion.div>
-
-            {/* 連絡先情報 */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-                連絡先情報
-              </h2>
-
-              <div className="space-y-6 mb-8">
-                {contactInfo.map((info, index) => (
-                  <motion.div
-                    key={info.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className="flex items-center space-x-4"
-                  >
-                    <div className="text-2xl">{info.icon}</div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {info.title}
-                      </h3>
-                      {info.link ? (
-                        <a
-                          href={info.link}
-                          className="text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          {info.value}
-                        </a>
-                      ) : (
-                        <p className="text-gray-600 dark:text-gray-300">
-                          {info.value}
-                        </p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* SNSリンク */}
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                  SNS・その他
-                </h3>
-                <div className="flex space-x-4">
-                  {socialLinks.map((social, index) => (
-                    <motion.a
-                      key={social.name}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      viewport={{ once: true }}
-                      whileHover={{ scale: 1.1 }}
-                      className={`w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-700 dark:text-gray-300 transition-colors ${social.color}`}
-                      aria-label={social.name}
-                    >
-                      {social.icon}
-                    </motion.a>
-                  ))}
-                </div>
-              </div>
-
-              {/* 営業時間 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                viewport={{ once: true }}
-                className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  営業時間
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  平日 9:00 - 18:00 (JST)
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  ※土日祝日は休業となります
-                </p>
-              </motion.div>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+                Contact
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                お仕事のご依頼や技術相談など、お気軽にお声がけください
+              </p>
             </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <Footer />
-    </main>
+        {/* メインコンテンツ */}
+        <section className="py-16 sm:py-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
+              {/* お問い合わせフォーム */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">
+                  お問い合わせフォーム
+                </h2>
+
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-4 sm:space-y-6"
+                >
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      お名前 *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base"
+                      placeholder="山田太郎"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      メールアドレス *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base"
+                      placeholder="example@email.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="subject"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      件名 *
+                    </label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base"
+                    >
+                      <option value="">選択してください</option>
+                      <option value="project">プロジェクトのご相談</option>
+                      <option value="consulting">技術コンサルティング</option>
+                      <option value="collaboration">共同開発のお誘い</option>
+                      <option value="other">その他</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      メッセージ *
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={5}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none text-sm sm:text-base"
+                      placeholder="プロジェクトの詳細やご要望をお聞かせください"
+                    />
+                  </div>
+
+                  <motion.button
+                    type="submit"
+                    disabled={isSubmitting}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full px-4 sm:px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+                  >
+                    {isSubmitting ? '送信中...' : '送信する'}
+                  </motion.button>
+
+                  {/* 送信ステータス */}
+                  {submitStatus === 'success' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg text-sm sm:text-base"
+                    >
+                      お問い合わせありがとうございます。後日ご連絡いたします。
+                    </motion.div>
+                  )}
+
+                  {submitStatus === 'error' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg text-sm sm:text-base"
+                    >
+                      送信に失敗しました。しばらく時間をおいて再度お試しください。
+                    </motion.div>
+                  )}
+                </form>
+              </motion.div>
+
+              {/* 連絡先情報 */}
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">
+                  連絡先情報
+                </h2>
+
+                <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
+                  {contactInfo.map((info, index) => (
+                    <motion.div
+                      key={info.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="flex items-center space-x-3 sm:space-x-4"
+                    >
+                      <div className="text-xl sm:text-2xl">{info.icon}</div>
+                      <div>
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                          {info.title}
+                        </h3>
+                        {info.link ? (
+                          <a
+                            href={info.link}
+                            className="text-sm sm:text-base text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {info.value}
+                          </a>
+                        ) : (
+                          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                            {info.value}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* SNSリンク */}
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">
+                    SNS・その他
+                  </h3>
+                  <div className="flex space-x-3 sm:space-x-4">
+                    {socialLinks.map((social, index) => (
+                      <motion.a
+                        key={social.name}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                        viewport={{ once: true }}
+                        whileHover={{ scale: 1.1 }}
+                        className={`w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-700 dark:text-gray-300 transition-colors ${social.color}`}
+                        aria-label={social.name}
+                      >
+                        {social.icon}
+                      </motion.a>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 営業時間 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  viewport={{ once: true }}
+                  className="mt-6 sm:mt-8 p-4 sm:p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+                >
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    営業時間
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                    平日 9:00 - 18:00 (JST)
+                  </p>
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    ※土日祝日は休業となります
+                  </p>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        <Footer />
+      </main>
+    </PageTransition>
   );
 }

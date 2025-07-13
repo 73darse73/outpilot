@@ -11,16 +11,19 @@ function PersonalityBlocks() {
   const [isForming, setIsForming] = useState(false);
   const [formationProgress, setFormationProgress] = useState(0);
 
-  const personalityTraits = [
-    'Engineer',
-    'Learner',
-    'Hobbyist',
-    'Team Player',
-    'Curious',
-    'Creative',
-    'Problem Solver',
-    'Innovator',
-  ];
+  const personalityTraits = useMemo(
+    () => [
+      'Engineer',
+      'Learner',
+      'Hobbyist',
+      'Team Player',
+      'Curious',
+      'Creative',
+      'Problem Solver',
+      'Innovator',
+    ],
+    [],
+  );
 
   // 人型の形成位置（抽象的な形）
   const humanFormPositions = [
@@ -42,7 +45,7 @@ function PersonalityBlocks() {
         (Math.random() - 0.5) * 15,
         (Math.random() - 0.5) * 15,
       ]),
-    [],
+    [personalityTraits],
   );
 
   useEffect(() => {

@@ -27,20 +27,20 @@ export declare class ThreadsService {
     findOne(id: number): Promise<({
         messages: {
             id: number;
-            createdAt: Date;
             content: string;
             role: string;
+            createdAt: Date;
             threadId: number;
         }[];
         summaries: {
             id: number;
-            title: string;
-            createdAt: Date;
-            updatedAt: Date;
             content: string;
-            threadId: number;
+            title: string;
             status: string;
             notionUrl: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            threadId: number;
         }[];
     } & {
         id: number;
@@ -63,64 +63,64 @@ export declare class ThreadsService {
     createMessage(threadId: number, createMessageDto: CreateMessageDto): Promise<{
         role: MessageRole;
         id: number;
-        createdAt: Date;
         content: string;
+        createdAt: Date;
         threadId: number;
     }>;
     generateAIResponse(threadId: number): Promise<void>;
     findMessages(threadId: number): Promise<{
         role: MessageRole;
         id: number;
-        createdAt: Date;
         content: string;
+        createdAt: Date;
         threadId: number;
     }[]>;
     findMessage(threadId: number, messageId: number): Promise<{
         role: MessageRole;
         id: number;
-        createdAt: Date;
         content: string;
+        createdAt: Date;
         threadId: number;
     }>;
     createSummary(threadId: number, createSummaryDto: CreateSummaryDto): Promise<{
         status: SummaryStatus;
         id: number;
+        content: string;
         title: string;
+        notionUrl: string | null;
         createdAt: Date;
         updatedAt: Date;
-        content: string;
         threadId: number;
-        notionUrl: string | null;
     }>;
     findSummaries(threadId: number): Promise<{
         status: SummaryStatus;
         id: number;
+        content: string;
         title: string;
+        notionUrl: string | null;
         createdAt: Date;
         updatedAt: Date;
-        content: string;
         threadId: number;
-        notionUrl: string | null;
     }[]>;
     findSummary(threadId: number, summaryId: number): Promise<{
         status: SummaryStatus;
         id: number;
+        content: string;
         title: string;
+        notionUrl: string | null;
         createdAt: Date;
         updatedAt: Date;
-        content: string;
         threadId: number;
-        notionUrl: string | null;
     }>;
     updateSummary(threadId: number, summaryId: number, updateSummaryDto: UpdateSummaryDto): Promise<{
         status: SummaryStatus;
         id: number;
+        content: string;
         title: string;
+        notionUrl: string | null;
         createdAt: Date;
         updatedAt: Date;
-        content: string;
         threadId: number;
-        notionUrl: string | null;
     }>;
     generateTitle(content: string): Promise<string>;
 }

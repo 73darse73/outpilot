@@ -155,6 +155,17 @@ exports.Prisma.SlideScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ArticleScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  status: 'status',
+  qiitaUrl: 'qiitaUrl',
+  threadId: 'threadId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -175,7 +186,8 @@ exports.Prisma.ModelName = {
   Thread: 'Thread',
   Message: 'Message',
   Summary: 'Summary',
-  Slide: 'Slide'
+  Slide: 'Slide',
+  Article: 'Article'
 };
 
 /**

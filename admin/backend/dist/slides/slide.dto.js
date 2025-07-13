@@ -6,7 +6,6 @@ class SlideDto {
     title;
     content;
     threadId;
-    isPublished;
     createdAt;
     updatedAt;
 }

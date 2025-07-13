@@ -4,23 +4,31 @@
   "description": "ChatGPTでの学びを「残す・整える・発信する」ためのAIアウトプット支援ツール＆ポートフォリオサイト",
   "private": true,
   "workspaces": [
-    "backend",
-    "frontend"
+    "admin/backend",
+    "admin/frontend",
+    "portfolio/backend",
+    "portfolio/frontend"
   ],
   "scripts": {
-    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
-    "dev:backend": "cd backend && pnpm run start:dev",
-    "dev:frontend": "cd frontend && pnpm run dev",
-    "build": "pnpm run build:backend && pnpm run build:frontend",
-    "build:backend": "cd backend && pnpm run build",
-    "build:frontend": "cd frontend && pnpm run build",
-    "start": "concurrently \"pnpm run start:backend\" \"pnpm run start:frontend\"",
-    "start:backend": "cd backend && pnpm run start:prod",
-    "start:frontend": "cd frontend && pnpm run start",
-    "db:up": "cd backend && docker compose up -d",
-    "db:down": "cd backend && docker compose down",
-    "db:migrate": "cd backend && pnpm dlx prisma migrate dev",
-    "db:generate": "cd backend && pnpm dlx prisma generate"
+    "dev": "concurrently \"pnpm run dev:admin-backend\" \"pnpm run dev:admin-frontend\"",
+    "dev:admin-backend": "cd admin/backend && pnpm run start:dev",
+    "dev:admin-frontend": "cd admin/frontend && pnpm run dev",
+    "dev:portfolio-backend": "cd portfolio/backend && pnpm run dev",
+    "dev:portfolio-frontend": "cd portfolio/frontend && pnpm run dev",
+    "build": "pnpm run build:admin-backend && pnpm run build:admin-frontend",
+    "build:admin-backend": "cd admin/backend && pnpm run build",
+    "build:admin-frontend": "cd admin/frontend && pnpm run build",
+    "build:portfolio-backend": "cd portfolio/backend && pnpm run build",
+    "build:portfolio-frontend": "cd portfolio/frontend && pnpm run build",
+    "start": "concurrently \"pnpm run start:admin-backend\" \"pnpm run start:admin-frontend\"",
+    "start:admin-backend": "cd admin/backend && pnpm run start:prod",
+    "start:admin-frontend": "cd admin/frontend && pnpm run start",
+    "start:portfolio-backend": "cd portfolio/backend && pnpm run start",
+    "start:portfolio-frontend": "cd portfolio/frontend && pnpm run start",
+    "db:up": "cd admin/backend && docker compose up -d",
+    "db:down": "cd admin/backend && docker compose down",
+    "db:migrate": "cd admin/backend && pnpm dlx prisma migrate dev",
+    "db:generate": "cd admin/backend && pnpm dlx prisma generate"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

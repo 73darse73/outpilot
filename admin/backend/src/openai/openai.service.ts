@@ -17,7 +17,7 @@ export class OpenAIService {
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo-0125',
         messages: messages,
-        max_tokens: 1000,
+        max_tokens: 3000,
         temperature: 0.7,
       });
 

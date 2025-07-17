@@ -5,4 +5,8 @@ export declare class ArticlesService {
     constructor(prisma: PrismaService);
     findAll(): Promise<ArticleDto[]>;
     findOne(id: number): Promise<ArticleDto | null>;
+    postToQiita(articleId: number): Promise<{
+        message: string;
+        url: any;
+    }>;
 }

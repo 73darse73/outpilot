@@ -123,4 +123,75 @@ export declare class ThreadsService {
         threadId: number;
     }>;
     generateTitle(content: string): Promise<string>;
+    generateArticle(threadId: number): Promise<{
+        id: number;
+        content: string;
+        title: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        threadId: number | null;
+        qiitaUrl: string | null;
+    }>;
+    generateSlide(threadId: number): Promise<{
+        id: number;
+        content: string;
+        title: string;
+        createdAt: Date;
+        updatedAt: Date;
+        threadId: number | null;
+    }>;
+    findArticles(threadId?: number): Promise<({
+        thread: {
+            id: number;
+            title: string | null;
+        } | null;
+    } & {
+        id: number;
+        content: string;
+        title: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        threadId: number | null;
+        qiitaUrl: string | null;
+    })[]>;
+    findSlides(threadId?: number): Promise<({
+        thread: {
+            id: number;
+            title: string | null;
+        } | null;
+    } & {
+        id: number;
+        content: string;
+        title: string;
+        createdAt: Date;
+        updatedAt: Date;
+        threadId: number | null;
+    })[]>;
+    updateArticle(articleId: number, updateData: {
+        title?: string;
+        content?: string;
+        status?: string;
+    }): Promise<{
+        id: number;
+        content: string;
+        title: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        threadId: number | null;
+        qiitaUrl: string | null;
+    }>;
+    updateSlide(slideId: number, updateData: {
+        title?: string;
+        content?: string;
+    }): Promise<{
+        id: number;
+        content: string;
+        title: string;
+        createdAt: Date;
+        updatedAt: Date;
+        threadId: number | null;
+    }>;
 }

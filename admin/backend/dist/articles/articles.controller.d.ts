@@ -5,4 +5,8 @@ export declare class ArticlesController {
     constructor(articlesService: ArticlesService);
     findAll(): Promise<ArticleDto[]>;
     findOne(id: number): Promise<ArticleDto>;
+    postToQiita(id: string): Promise<{
+        message: string;
+        url: any;
+    }>;
 }

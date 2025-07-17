@@ -331,4 +331,164 @@ export class ThreadsService {
       return '新規チャット';
     }
   }
+
+  // 記事生成機能
+  async generateArticle(threadId: number) {
+    try {
+      console.log(`記事生成開始: threadId=${threadId}`);
+
+      const thread = await this.findOne(threadId);
+      if (!thread) {
+        throw new NotFoundException(`Thread with ID ${threadId} not found`);
+      }
+
+      console.log(`スレッド取得完了: ${thread.title}`);
+
+      // スレッドのメッセージ内容を取得
+      const messages = thread.messages.map((msg) => msg.content);
+      console.log(`メッセージ数: ${messages.length}`);
+
+      // OpenAIサービスを使用して記事を生成
+      console.log('OpenAI API呼び出し開始');
+      const articleContent =
+        await this.openaiService.generateArticleFromThread(messages);
+      console.log('OpenAI API呼び出し完了');
+
+      // 記事をデータベースに保存
+      console.log('データベース保存開始');
+      const existing = await this.prisma.article.findFirst({
+        where: { threadId: threadId, status: 'draft' },
+      });
+      let article;
+      if (existing) {
+        article = await this.prisma.article.update({
+          where: { id: existing.id },
+          data: {
+            title: thread.title || '無題の記事',
+            content: articleContent,
+            status: 'draft',
+          },
+        });
+      } else {
+        article = await this.prisma.article.create({
+          data: {
+            title: thread.title || '無題の記事',
+            content: articleContent,
+            status: 'draft',
+            threadId: threadId,
+          },
+        });
+      }
+      console.log('データベース保存完了');
+
+      return article;
+    } catch (error) {
+      console.error('記事生成エラー詳細:', error);
+      console.error('エラースタック:', error.stack);
+      console.error('エラーメッセージ:', error.message);
+      throw error;
+    }
+  }
+
+  // スライド生成機能
+  async generateSlide(threadId: number) {
+    const thread = await this.findOne(threadId);
+    if (!thread) {
+      throw new NotFoundException(`Thread with ID ${threadId} not found`);
+    }
+
+    // スレッドのメッセージ内容を取得
+    const messages = thread.messages.map((msg) => msg.content);
+
+    // OpenAIサービスを使用してスライドを生成
+    const slideContent =
+      await this.openaiService.generateSlideFromThread(messages);
+
+    // スライドをデータベースに保存
+    const slide = await this.prisma.slide.create({
+      data: {
+        title: thread.title || '無題のスライド',
+        content: slideContent,
+        threadId: threadId,
+      },
+    });
+
+    return slide;
+  }
+
+  // 記事一覧取得
+  async findArticles(threadId?: number) {
+    const where = threadId ? { threadId } : {};
+    return this.prisma.article.findMany({
+      where,
+      include: {
+        thread: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  // スライド一覧取得
+  async findSlides(threadId?: number) {
+    const where = threadId ? { threadId } : {};
+    return this.prisma.slide.findMany({
+      where,
+      include: {
+        thread: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  // 記事更新
+  async updateArticle(
+    articleId: number,
+    updateData: { title?: string; content?: string; status?: string },
+  ) {
+    const article = await this.prisma.article.findUnique({
+      where: { id: articleId },
+    });
+
+    if (!article) {
+      throw new NotFoundException(`Article with ID ${articleId} not found`);
+    }
+
+    return this.prisma.article.update({
+      where: { id: articleId },
+      data: updateData,
+    });
+  }
+
+  // スライド更新
+  async updateSlide(
+    slideId: number,
+    updateData: { title?: string; content?: string },
+  ) {
+    const slide = await this.prisma.slide.findUnique({
+      where: { id: slideId },
+    });
+
+    if (!slide) {
+      throw new NotFoundException(`Slide with ID ${slideId} not found`);
+    }
+
+    return this.prisma.slide.update({
+      where: { id: slideId },
+      data: updateData,
+    });
+  }
 }

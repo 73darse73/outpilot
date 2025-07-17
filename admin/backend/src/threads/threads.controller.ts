@@ -117,7 +117,7 @@ export class ThreadsController {
   }
 
   @Post(':id/generate-slide')
-  async generateSlide(
+  async generateSlideFromThread(
     @Param('id', ParseIntPipe) threadId: number,
   ): Promise<SlideDto> {
     return this.slidesService.generateFromThread(threadId);
@@ -141,5 +141,59 @@ export class ThreadsController {
       summaryId,
       updateSummaryDto,
     );
+  }
+
+  // 記事生成
+  @Post(':id/articles')
+  async generateArticle(@Param('id', ParseIntPipe) id: number) {
+    return this.threadsService.generateArticle(id);
+  }
+
+  // スライド生成
+  @Post(':id/slides')
+  async generateSlide(@Param('id', ParseIntPipe) id: number) {
+    return this.threadsService.generateSlide(id);
+  }
+
+  // 記事一覧取得
+  @Get('articles')
+  async findArticles() {
+    return this.threadsService.findArticles();
+  }
+
+  // スレッドの記事一覧取得
+  @Get(':id/articles')
+  async findThreadArticles(@Param('id', ParseIntPipe) id: number) {
+    return this.threadsService.findArticles(id);
+  }
+
+  // スライド一覧取得
+  @Get('slides')
+  async findSlides() {
+    return this.threadsService.findSlides();
+  }
+
+  // スレッドのスライド一覧取得
+  @Get(':id/slides')
+  async findThreadSlides(@Param('id', ParseIntPipe) id: number) {
+    return this.threadsService.findSlides(id);
+  }
+
+  // 記事更新
+  @Patch('articles/:articleId')
+  async updateArticle(
+    @Param('articleId', ParseIntPipe) articleId: number,
+    @Body() updateData: { title?: string; content?: string; status?: string },
+  ) {
+    return this.threadsService.updateArticle(articleId, updateData);
+  }
+
+  // スライド更新
+  @Patch('slides/:slideId')
+  async updateSlide(
+    @Param('slideId', ParseIntPipe) slideId: number,
+    @Body() updateData: { title?: string; content?: string },
+  ) {
+    return this.threadsService.updateSlide(slideId, updateData);
   }
 }

@@ -75,7 +75,7 @@ let ThreadsController = class ThreadsController {
         const title = await this.threadsService.generateTitle(body.content);
         return { title };
     }
-    async generateSlide(threadId) {
+    async generateSlideFromThread(threadId) {
         return this.slidesService.generateFromThread(threadId);
     }
     async findSummaries(threadId) {
@@ -83,6 +83,30 @@ let ThreadsController = class ThreadsController {
     }
     async updateSummary(threadId, summaryId, updateSummaryDto) {
         return this.threadsService.updateSummary(threadId, summaryId, updateSummaryDto);
+    }
+    async generateArticle(id) {
+        return this.threadsService.generateArticle(id);
+    }
+    async generateSlide(id) {
+        return this.threadsService.generateSlide(id);
+    }
+    async findArticles() {
+        return this.threadsService.findArticles();
+    }
+    async findThreadArticles(id) {
+        return this.threadsService.findArticles(id);
+    }
+    async findSlides() {
+        return this.threadsService.findSlides();
+    }
+    async findThreadSlides(id) {
+        return this.threadsService.findSlides(id);
+    }
+    async updateArticle(articleId, updateData) {
+        return this.threadsService.updateArticle(articleId, updateData);
+    }
+    async updateSlide(slideId, updateData) {
+        return this.threadsService.updateSlide(slideId, updateData);
     }
 };
 exports.ThreadsController = ThreadsController;
@@ -172,7 +196,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], ThreadsController.prototype, "generateSlide", null);
+], ThreadsController.prototype, "generateSlideFromThread", null);
 __decorate([
     (0, common_1.Get)(':id/summaries'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -189,6 +213,62 @@ __decorate([
     __metadata("design:paramtypes", [Number, Number, update_summary_dto_1.UpdateSummaryDto]),
     __metadata("design:returntype", Promise)
 ], ThreadsController.prototype, "updateSummary", null);
+__decorate([
+    (0, common_1.Post)(':id/articles'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "generateArticle", null);
+__decorate([
+    (0, common_1.Post)(':id/slides'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "generateSlide", null);
+__decorate([
+    (0, common_1.Get)('articles'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "findArticles", null);
+__decorate([
+    (0, common_1.Get)(':id/articles'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "findThreadArticles", null);
+__decorate([
+    (0, common_1.Get)('slides'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "findSlides", null);
+__decorate([
+    (0, common_1.Get)(':id/slides'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "findThreadSlides", null);
+__decorate([
+    (0, common_1.Patch)('articles/:articleId'),
+    __param(0, (0, common_1.Param)('articleId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "updateArticle", null);
+__decorate([
+    (0, common_1.Patch)('slides/:slideId'),
+    __param(0, (0, common_1.Param)('slideId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], ThreadsController.prototype, "updateSlide", null);
 exports.ThreadsController = ThreadsController = __decorate([
     (0, common_1.Controller)('threads'),
     __metadata("design:paramtypes", [threads_service_1.ThreadsService,

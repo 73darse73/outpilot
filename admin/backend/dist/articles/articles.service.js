@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArticlesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const axios_1 = require("axios");
 let ArticlesService = class ArticlesService {
     prisma;
     constructor(prisma) {
@@ -54,6 +55,37 @@ let ArticlesService = class ArticlesService {
             createdAt: article.createdAt.toISOString(),
             updatedAt: article.updatedAt.toISOString(),
         };
+    }
+    async postToQiita(articleId) {
+        const article = await this.prisma.article.findUnique({
+            where: { id: articleId },
+        });
+        if (!article)
+            throw new Error('記事が見つかりません');
+        if (article.status === 'published' && article.qiitaUrl) {
+            return { message: 'すでにQiitaに投稿済み', url: article.qiitaUrl };
+        }
+        const qiitaToken = process.env.QIITA_TOKEN;
+        if (!qiitaToken)
+            throw new Error('Qiita APIトークンが設定されていません');
+        const body = {
+            title: article.title,
+            body: article.content,
+            tags: [],
+            private: false,
+        };
+        const res = await axios_1.default.post('https://qiita.com/api/v2/items', body, {
+            headers: {
+                Authorization: `Bearer ${qiitaToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const qiitaUrl = res.data.url;
+        await this.prisma.article.update({
+            where: { id: articleId },
+            data: { status: 'published', qiitaUrl },
+        });
+        return { message: 'Qiitaに投稿しました', url: qiitaUrl };
     }
 };
 exports.ArticlesService = ArticlesService;

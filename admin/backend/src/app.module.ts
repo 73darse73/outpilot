@@ -6,6 +6,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ThreadsModule } from './threads/threads.module';
 import { SlidesModule } from './slides/slides.module';
 import { ArticlesModule } from './articles/articles.module';
+import { OpenAIModule } from './openai/openai.module';
+import { OpenAIController } from './openai/openai.controller';
 
 @Module({
   imports: [
@@ -16,8 +18,9 @@ import { ArticlesModule } from './articles/articles.module';
     ThreadsModule,
     SlidesModule,
     ArticlesModule,
+    OpenAIModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, OpenAIController],
   providers: [AppService],
 })
 export class AppModule {}

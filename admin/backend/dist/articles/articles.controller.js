@@ -30,6 +30,12 @@ let ArticlesController = class ArticlesController {
         }
         return article;
     }
+    async postToQiita(id) {
+        const articleId = Number(id);
+        if (isNaN(articleId))
+            throw new common_1.NotFoundException('Invalid article id');
+        return this.articlesService.postToQiita(articleId);
+    }
 };
 exports.ArticlesController = ArticlesController;
 __decorate([
@@ -45,6 +51,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ArticlesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)(':id/qiita'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ArticlesController.prototype, "postToQiita", null);
 exports.ArticlesController = ArticlesController = __decorate([
     (0, common_1.Controller)('articles'),
     __metadata("design:paramtypes", [articles_service_1.ArticlesService])

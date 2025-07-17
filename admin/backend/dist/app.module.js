@@ -15,6 +15,8 @@ const prisma_module_1 = require("./prisma/prisma.module");
 const threads_module_1 = require("./threads/threads.module");
 const slides_module_1 = require("./slides/slides.module");
 const articles_module_1 = require("./articles/articles.module");
+const openai_module_1 = require("./openai/openai.module");
+const openai_controller_1 = require("./openai/openai.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,8 +30,9 @@ exports.AppModule = AppModule = __decorate([
             threads_module_1.ThreadsModule,
             slides_module_1.SlidesModule,
             articles_module_1.ArticlesModule,
+            openai_module_1.OpenAIModule,
         ],
-        controllers: [app_controller_1.AppController],
+        controllers: [app_controller_1.AppController, openai_controller_1.OpenAIController],
         providers: [app_service_1.AppService],
     })
 ], AppModule);

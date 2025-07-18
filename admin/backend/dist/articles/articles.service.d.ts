@@ -5,8 +5,10 @@ export declare class ArticlesService {
     constructor(prisma: PrismaService);
     findAll(): Promise<ArticleDto[]>;
     findOne(id: number): Promise<ArticleDto | null>;
-    postToQiita(articleId: number): Promise<{
+    postToQiita(articleId: number, tags?: {
+        name: string;
+    }[]): Promise<{
         message: string;
-        url: any;
+        url: string;
     }>;
 }

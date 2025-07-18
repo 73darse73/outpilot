@@ -4,21 +4,97 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useThreads } from '@/hooks/useThreads';
+import { PreviewProvider, usePreview } from './PreviewContext';
+import { ArticlePreview } from './components/ArticlePreview';
+import { SlidePreview } from './components/SlidePreview';
+import { getArticle, getSlide } from '@/lib/api/client';
+import { useParams } from 'next/navigation';
 
-export default function ThreadsLayout({
+function ThreadsLayoutContent({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const { threads, loading, error, fetchThreads, createThread, deleteThread } =
     useThreads();
+  const {
+    isPreviewOpen,
+    setIsPreviewOpen,
+    previewType,
+    setPreviewType,
+    previewContent,
+    previewTitle,
+    isGeneratingPreview,
+    fetchPreview,
+    previewArticle,
+  } = usePreview();
+  // DB取得用のstate名を削除
+  const [previewTypeDb, setPreviewTypeDb] = useState<'article' | 'slide'>(
+    'article',
+  );
+  const [isLoadingPreviewDb, setIsLoadingPreviewDb] = useState(false);
+  const [threadId, setThreadId] = useState<number | null>(null);
+
+  const params = useParams();
+  console.log('params:', params);
 
   useEffect(() => {
     fetchThreads();
   }, [fetchThreads]);
+
+  useEffect(() => {
+    if (params && params.id) {
+      setThreadId(Number(params.id));
+      console.log('setThreadId:', params.id);
+    }
+  }, [params]);
+
+  useEffect(() => {
+    console.log('threadId after set:', threadId);
+  }, [threadId]);
+
+  // プレビュー切り替え時にDBから取得
+  useEffect(() => {
+    console.log('threadId:', threadId);
+    if (!threadId) return;
+    setIsLoadingPreviewDb(true);
+    const fetchPreview = async () => {
+      try {
+        if (previewTypeDb === 'article') {
+          const article = await getArticle(threadId);
+          console.log('getArticle result:', article);
+          if (article) {
+            // setPreviewContentDb(article.content); // Removed
+            // setPreviewTitleDb(article.title); // Removed
+          } else {
+            // setPreviewContentDb('記事がありません'); // Removed
+            // setPreviewTitleDb(''); // Removed
+          }
+        } else {
+          const slide = await getSlide(threadId);
+          console.log('getSlide result:', slide);
+          if (slide) {
+            // setPreviewContentDb(slide.content); // Removed
+            // setPreviewTitleDb(slide.title); // Removed
+          } else {
+            // setPreviewContentDb('スライドがありません'); // Removed
+            // setPreviewTitleDb(''); // Removed
+          }
+        }
+      } finally {
+        setIsLoadingPreviewDb(false);
+      }
+    };
+    fetchPreview();
+  }, [previewTypeDb, threadId]);
+
+  useEffect(() => {
+    if (threadId && previewTypeDb) {
+      fetchPreview(threadId, previewTypeDb);
+    }
+  }, [threadId, previewTypeDb]);
 
   const handleCreateThread = async () => {
     try {
@@ -56,7 +132,7 @@ export default function ThreadsLayout({
       {/* 左サイドバー */}
       <div
         className={`
-        fixed left-0 top-0 h-full border-r transition-all duration-300 overflow-hidden
+        fixed left-0 top-0 h-full border-r transition-all duration-300 overflow-hidden z-20
         bg-gray-50 dark:bg-gray-800
         border-gray-200 dark:border-gray-700
         ${isSidebarOpen ? 'w-64' : 'w-0'}
@@ -93,10 +169,10 @@ export default function ThreadsLayout({
                     href={`/threads/${thread.id}`}
                     className="block p-4 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
                   >
-                    <div className="font-medium truncate">
+                    <div className="font-medium break-words pr-8">
                       {thread.title || '無題のスレッド'}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {thread._count?.messages || 0} メッセージ
                     </div>
                   </Link>
@@ -130,7 +206,7 @@ export default function ThreadsLayout({
       {/* メインコンテンツ */}
       <main
         className={`
-        flex-1 transition-all duration-300
+        flex-1 transition-all duration-300 min-w-0
         bg-white dark:bg-gray-900
         text-gray-900 dark:text-gray-100
         ${isSidebarOpen ? 'ml-64' : 'ml-0'}
@@ -140,19 +216,105 @@ export default function ThreadsLayout({
         {children}
       </main>
 
-      {/* 右サイドパネル（スライドプレビュー） */}
+      {/* 右サイドパネル（プレビュー） */}
       <div
         className={`
-        fixed right-0 top-0 h-full border-l transition-all duration-300
+        fixed right-0 top-0 h-full border-l transition-all duration-300 z-20
         bg-white dark:bg-gray-800
         border-gray-200 dark:border-gray-700
         text-gray-900 dark:text-gray-100
         ${isPreviewOpen ? 'w-96' : 'w-0'}
       `}
       >
-        <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">スライドプレビュー</h2>
-          {/* ここにスライドプレビューの内容 */}
+        <div className="h-full flex flex-col">
+          {/* プレビューヘッダー */}
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {previewTypeDb === 'article'
+                  ? '記事プレビュー'
+                  : previewTypeDb === 'slide'
+                  ? 'スライドプレビュー'
+                  : 'プレビュー'}
+              </h3>
+              {previewTypeDb && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setIsPreviewOpen(false);
+                    }}
+                    className="px-3 py-1 text-sm bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                  >
+                    閉じる
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* プレビューコンテンツ */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {/* プレビュー切り替えタブ */}
+            <div className="flex space-x-2 mb-4">
+              <button
+                className={`px-4 py-2 rounded-t ${
+                  previewTypeDb === 'article'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+                onClick={() => setPreviewTypeDb('article')}
+              >
+                記事プレビュー
+              </button>
+              <button
+                className={`px-4 py-2 rounded-t ${
+                  previewTypeDb === 'slide'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+                onClick={() => setPreviewTypeDb('slide')}
+              >
+                スライドプレビュー
+              </button>
+            </div>
+            {isLoadingPreviewDb ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {previewTypeDb === 'article'
+                      ? '記事を読み込み中...'
+                      : 'スライドを読み込み中...'}
+                  </p>
+                </div>
+              </div>
+            ) : previewTypeDb === 'article' ? (
+              previewArticle ? (
+                <ArticlePreview article={previewArticle} />
+              ) : (
+                <ArticlePreview
+                  article={{
+                    id: 0,
+                    title: previewTitle,
+                    content: previewContent,
+                    status: 'draft',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  }}
+                />
+              )
+            ) : (
+              <SlidePreview
+                slide={{
+                  id: 0,
+                  title: previewTitle,
+                  content: previewContent,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
 
@@ -160,7 +322,7 @@ export default function ThreadsLayout({
       <button
         onClick={() => setIsPreviewOpen(!isPreviewOpen)}
         className={`
-          fixed top-4 right-0 z-10 p-2 rounded transition-all duration-300
+          fixed top-4 z-10 p-2 rounded transition-all duration-300
           bg-gray-200 dark:bg-gray-700
           hover:bg-gray-300 dark:hover:bg-gray-600
           text-gray-700 dark:text-gray-300
@@ -170,5 +332,17 @@ export default function ThreadsLayout({
         {isPreviewOpen ? '→' : '←'}
       </button>
     </div>
+  );
+}
+
+export default function ThreadsLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <PreviewProvider>
+      <ThreadsLayoutContent>{children}</ThreadsLayoutContent>
+    </PreviewProvider>
   );
 }

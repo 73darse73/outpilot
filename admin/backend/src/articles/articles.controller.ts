@@ -30,9 +30,12 @@ export class ArticlesController {
   }
 
   @Post(':id/qiita')
-  async postToQiita(@Param('id') id: string) {
+  async postToQiita(
+    @Param('id') id: string,
+    @Body() body: { tags?: { name: string }[] },
+  ) {
     const articleId = Number(id);
     if (isNaN(articleId)) throw new NotFoundException('Invalid article id');
-    return this.articlesService.postToQiita(articleId);
+    return this.articlesService.postToQiita(articleId, body.tags || []);
   }
 }

@@ -56,7 +56,7 @@ let ArticlesService = class ArticlesService {
             updatedAt: article.updatedAt.toISOString(),
         };
     }
-    async postToQiita(articleId) {
+    async postToQiita(articleId, tags = []) {
         const article = await this.prisma.article.findUnique({
             where: { id: articleId },
         });
@@ -68,10 +68,14 @@ let ArticlesService = class ArticlesService {
         const qiitaToken = process.env.QIITA_TOKEN;
         if (!qiitaToken)
             throw new Error('Qiita APIトークンが設定されていません');
+        const qiitaTags = (tags || []).map((tag) => ({
+            name: tag.name,
+            versions: [],
+        }));
         const body = {
             title: article.title,
             body: article.content,
-            tags: [],
+            tags: qiitaTags,
             private: false,
         };
         const res = await axios_1.default.post('https://qiita.com/api/v2/items', body, {

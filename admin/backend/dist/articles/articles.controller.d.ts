@@ -5,8 +5,12 @@ export declare class ArticlesController {
     constructor(articlesService: ArticlesService);
     findAll(): Promise<ArticleDto[]>;
     findOne(id: number): Promise<ArticleDto>;
-    postToQiita(id: string): Promise<{
+    postToQiita(id: string, body: {
+        tags?: {
+            name: string;
+        }[];
+    }): Promise<{
         message: string;
-        url: any;
+        url: string;
     }>;
 }

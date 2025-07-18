@@ -6,6 +6,27 @@ import {
   type CreateThread,
 } from './types';
 
+// 記事とスライドの型定義を追加
+export interface Article {
+  id: number;
+  title: string;
+  content: string;
+  status: string;
+  qiitaUrl?: string;
+  threadId?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Slide {
+  id: number;
+  title: string;
+  content: string;
+  threadId?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
 
 class ApiError extends Error {
@@ -121,6 +142,76 @@ export const threadsApi = {
       body: JSON.stringify({ content }),
     });
   },
+
+  // 記事を生成
+  generateArticle: (threadId: number): Promise<Article> => {
+    return apiRequest<Article>(`/threads/${threadId}/articles`, {
+      method: 'POST',
+    });
+  },
+
+  // 記事一覧を取得
+  getArticles: (threadId?: number): Promise<Article[]> => {
+    const endpoint = threadId
+      ? `/threads/${threadId}/articles`
+      : '/threads/articles';
+    return apiRequest<Article[]>(endpoint);
+  },
+
+  // 記事を更新
+  updateArticle: (
+    articleId: number,
+    data: { title?: string; content?: string; status?: string },
+  ): Promise<Article> => {
+    return apiRequest<Article>(`/threads/articles/${articleId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // スライド一覧を取得
+  getSlides: (threadId?: number): Promise<Slide[]> => {
+    const endpoint = threadId
+      ? `/threads/${threadId}/slides`
+      : '/threads/slides';
+    return apiRequest<Slide[]>(endpoint);
+  },
+
+  // スライドを更新
+  updateSlide: (
+    slideId: number,
+    data: { title?: string; content?: string },
+  ): Promise<Slide> => {
+    return apiRequest<Slide>(`/threads/slides/${slideId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // タグ自動生成（OpenAI）
+  generateTags: (
+    title: string,
+    body: string,
+  ): Promise<{ tags: { name: string }[] }> => {
+    return apiRequest<{ tags: { name: string }[] }>('/openai/generate-tags', {
+      method: 'POST',
+      body: JSON.stringify({ title, body }),
+    });
+  },
+};
+
+export const getArticle = async (threadId: number) => {
+  const articles = await threadsApi.getArticles(threadId);
+  if (!articles || articles.length === 0) return null;
+  // updatedAtが一番新しい記事を返す
+  return articles.sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  )[0];
+};
+
+export const getSlide = async (threadId: number) => {
+  const slides = await threadsApi.getSlides(threadId);
+  return slides && slides.length > 0 ? slides[0] : null;
 };
 
 export { ApiError };

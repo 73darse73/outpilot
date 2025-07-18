@@ -219,7 +219,12 @@ graph TD;
                 max_tokens: 4000,
                 temperature: 0.7,
             });
-            return (completion.choices[0]?.message?.content || '記事を生成できませんでした');
+            const rawContent = completion.choices[0]?.message?.content || '記事を生成できませんでした';
+            const cleanContent = rawContent
+                .replace(/^```markdown\n?/, '')
+                .replace(/```\s*$/, '')
+                .trim();
+            return cleanContent;
         }
         catch (error) {
             console.error('記事生成エラー:', error);

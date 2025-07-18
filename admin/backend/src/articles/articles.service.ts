@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ArticleDto } from './article.dto';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+
+interface QiitaPostResponse {
+  url: string;
+  [key: string]: any;
+}
 
 @Injectable()
 export class ArticlesService {
@@ -50,7 +55,7 @@ export class ArticlesService {
     };
   }
 
-  async postToQiita(articleId: number) {
+  async postToQiita(articleId: number, tags: { name: string }[] = []) {
     // 記事をDBから取得
     const article = await this.prisma.article.findUnique({
       where: { id: articleId },
@@ -64,21 +69,29 @@ export class ArticlesService {
     const qiitaToken = process.env.QIITA_TOKEN;
     if (!qiitaToken) throw new Error('Qiita APIトークンが設定されていません');
 
-    // Qiita API仕様に合わせてbodyを作成
+    // Qiita API仕様に合わせてtagsを{name, versions: []}形式に変換
+    const qiitaTags = (tags || []).map((tag) => ({
+      name: tag.name,
+      versions: [],
+    }));
     const body = {
       title: article.title,
       body: article.content,
-      tags: [], // 必要ならタグ抽出ロジックを追加
+      tags: qiitaTags,
       private: false,
     };
 
     // Qiita APIに投稿
-    const res = await axios.post('https://qiita.com/api/v2/items', body, {
-      headers: {
-        Authorization: `Bearer ${qiitaToken}`,
-        'Content-Type': 'application/json',
+    const res: AxiosResponse<QiitaPostResponse> = await axios.post(
+      'https://qiita.com/api/v2/items',
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${qiitaToken}`,
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
     const qiitaUrl = res.data.url;
 
     // DBを更新（status, qiitaUrl）

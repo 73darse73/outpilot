@@ -1,31 +1,11 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { Metadata } from 'next';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import TitleBackground from '../components/TitleBackground';
 import PageTransition from '../components/PageTransition';
 // import AboutBackground from '../components/AboutBackground';
-
-export const metadata: Metadata = {
-  title: 'About',
-  description:
-    'WebエンジニアKodamaの自己紹介。職歴、学歴、技術スタック、興味・関心について詳しくご紹介します。',
-  keywords: [
-    'About',
-    '自己紹介',
-    '職歴',
-    '学歴',
-    '技術スタック',
-    'Web Engineer',
-  ],
-  openGraph: {
-    title: 'About | Outpilot Portfolio',
-    description:
-      'WebエンジニアKodamaの自己紹介。職歴、学歴、技術スタック、興味・関心について詳しくご紹介します。',
-  },
-};
 
 export default function AboutPage() {
   const experiences = [

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import * as THREE from 'three';
+import { usePortfolioData } from '../hooks/usePortfolioData';
 
 function FloatingParticles() {
   const groupRef = useRef<THREE.Group>(null);
@@ -37,6 +38,9 @@ function FloatingParticles() {
 }
 
 export default function CTASection() {
+  const { totalProjects, totalArticles, totalSlides, loading } =
+    usePortfolioData();
+
   return (
     <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 relative overflow-hidden">
       {/* Three.js背景 */}
@@ -119,16 +123,22 @@ export default function CTASection() {
             className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8"
           >
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold mb-2">50+</div>
+              <div className="text-3xl md:text-4xl font-bold mb-2">
+                {loading ? '...' : `${totalProjects}+`}
+              </div>
               <div className="text-blue-100">プロジェクト完了</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold mb-2">3+</div>
-              <div className="text-blue-100">年の開発経験</div>
+              <div className="text-3xl md:text-4xl font-bold mb-2">
+                {loading ? '...' : `${totalArticles}+`}
+              </div>
+              <div className="text-blue-100">技術記事</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold mb-2">100%</div>
-              <div className="text-blue-100">クライアント満足度</div>
+              <div className="text-3xl md:text-4xl font-bold mb-2">
+                {loading ? '...' : `${totalSlides}+`}
+              </div>
+              <div className="text-blue-100">プレゼンテーション</div>
             </div>
           </motion.div>
         </motion.div>

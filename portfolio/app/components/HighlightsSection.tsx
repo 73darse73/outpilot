@@ -2,6 +2,7 @@
 
 import { motion } from 'motion/react';
 import Link from 'next/link';
+import { usePortfolioData } from '../hooks/usePortfolioData';
 
 interface Project {
   id: string;
@@ -13,50 +14,57 @@ interface Project {
   github?: string;
 }
 
-const highlights: Project[] = [
-  {
-    id: '1',
-    title: 'Outpilot',
-    description:
-      'AIを活用したプレゼンテーション作成ツール。自然言語でスライドを生成し、効率的な資料作成を支援します。',
-    image: '/api/placeholder/400/250',
-    tags: ['Next.js', 'TypeScript', 'OpenAI', 'Prisma'],
-    link: '/projects',
-    github: 'https://github.com/yourusername/outpilot',
-  },
-  {
-    id: '2',
-    title: 'ポートフォリオサイト',
-    description:
-      'モダンなデザインとアニメーションを採用した個人ポートフォリオサイト。技術力とアウトプット力をアピール。',
-    image: '/api/placeholder/400/250',
-    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
-    link: '/',
-    github: 'https://github.com/yourusername/portfolio',
-  },
-  {
-    id: '3',
-    title: 'ECサイト',
-    description:
-      'フルスタックECサイト。商品管理、決済、ユーザー管理機能を備えた本格的なオンラインショップ。',
-    image: '/api/placeholder/400/250',
-    tags: ['React', 'Node.js', 'PostgreSQL', 'Stripe'],
-    link: '/projects',
-    github: 'https://github.com/yourusername/ec-site',
-  },
-  {
-    id: '4',
-    title: 'タスク管理アプリ',
-    description:
-      'チーム協働に特化したタスク管理アプリ。リアルタイム更新、通知機能で効率的なプロジェクト管理を実現。',
-    image: '/api/placeholder/400/250',
-    tags: ['React', 'Socket.io', 'MongoDB', 'Express'],
-    link: '/projects',
-    github: 'https://github.com/yourusername/task-manager',
-  },
-];
-
 export default function HighlightsSection() {
+  const { recentArticles, recentSlides, loading } = usePortfolioData();
+
+  // 動的プロジェクトデータを生成
+  const dynamicHighlights: Project[] = [
+    {
+      id: 'outpilot',
+      title: 'Outpilot',
+      description:
+        'AIを活用した学習支援ツール。チャット形式で記事やスライドを作成し、Qiita投稿やポートフォリオ表示まで一気通貫で管理できます。',
+      image: '/api/placeholder/400/250',
+      tags: ['Next.js', 'TypeScript', 'OpenAI', 'Prisma'],
+      link: '/projects',
+      github: 'https://github.com/yourusername/outpilot',
+    },
+    {
+      id: 'portfolio',
+      title: 'ポートフォリオサイト',
+      description:
+        'モダンなデザインとアニメーションを採用した個人ポートフォリオサイト。技術力とアウトプット力をアピール。',
+      image: '/api/placeholder/400/250',
+      tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
+      link: '/',
+      github: 'https://github.com/yourusername/portfolio',
+    },
+    ...(recentArticles.length > 0
+      ? [
+          {
+            id: 'latest-article',
+            title: '最新記事',
+            description: recentArticles[0]?.title || '技術記事',
+            image: '/api/placeholder/400/250',
+            tags: ['技術記事', 'Qiita'],
+            link: recentArticles[0]?.qiitaUrl || '/projects',
+          },
+        ]
+      : []),
+    ...(recentSlides.length > 0
+      ? [
+          {
+            id: 'latest-slide',
+            title: '最新スライド',
+            description: recentSlides[0]?.title || 'プレゼンテーション',
+            image: '/api/placeholder/400/250',
+            tags: ['プレゼンテーション', 'Marp'],
+            link: '/projects',
+          },
+        ]
+      : []),
+  ];
+
   return (
     <section className="py-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto px-4">
@@ -76,72 +84,99 @@ export default function HighlightsSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {highlights.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="group"
-            >
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                {/* プロジェクト画像 */}
-                <div className="relative h-48 bg-gradient-to-br from-blue-400 to-purple-600 overflow-hidden">
-                  <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl mb-2">🚀</div>
-                      <div className="text-sm opacity-90">{project.title}</div>
+          {loading
+            ? // ローディング状態
+              Array.from({ length: 4 }, (_, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="group"
+                >
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden animate-pulse">
+                    <div className="h-48 bg-gray-200 dark:bg-gray-700" />
+                    <div className="p-6">
+                      <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-6" />
+                      <div className="flex gap-2 mb-6">
+                        <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded-full" />
+                        <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
+                      </div>
+                      <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded" />
                     </div>
                   </div>
-                </div>
+                </motion.div>
+              ))
+            : dynamicHighlights.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group"
+                >
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    {/* プロジェクト画像 */}
+                    <div className="relative h-48 bg-gradient-to-br from-blue-400 to-purple-600 overflow-hidden">
+                      <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-white text-center">
+                          <div className="text-4xl mb-2">🚀</div>
+                          <div className="text-sm opacity-90">
+                            {project.title}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                {/* プロジェクト情報 */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {project.title}
-                  </h3>
+                    {/* プロジェクト情報 */}
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {project.title}
+                      </h3>
 
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                    {project.description}
-                  </p>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                        {project.description}
+                      </p>
 
-                  {/* タグ */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                      {/* タグ */}
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {project.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* アクションボタン */}
+                      <div className="flex gap-3">
+                        <Link
+                          href={project.link}
+                          className="flex-1 px-4 py-2 bg-blue-600 text-white text-center rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                        >
+                          詳細を見る
+                        </Link>
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          >
+                            GitHub
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                  {/* アクションボタン */}
-                  <div className="flex gap-3">
-                    <Link
-                      href={project.link}
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white text-center rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                    >
-                      詳細を見る
-                    </Link>
-                    {project.github && (
-                      <a
-                        href={project.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                      >
-                        GitHub
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                </motion.div>
+              ))}
         </div>
 
         {/* もっと見るボタン */}

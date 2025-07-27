@@ -9,7 +9,6 @@ import HighlightsSection from './components/HighlightsSection';
 import CTASection from './components/CTASection';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
-// import ThreeBackground from './components/ThreeBackground';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);

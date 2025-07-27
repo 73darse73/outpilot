@@ -1,6 +1,7 @@
 packages:
   - backend
   - frontend
+  - portfolio
 ignoredBuiltDependencies:
   - '@nestjs/core'
   - '@prisma/client'

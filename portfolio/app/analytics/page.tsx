@@ -5,9 +5,13 @@ import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import TitleBackground from '../components/TitleBackground';
 import PageTransition from '../components/PageTransition';
+import { useSkillCategoryScore } from '../hooks/useSkillCategoryScore';
+import SkillScoreChart from '../components/SkillScoreChart';
 // import AnalyticsBackground from '../components/AnalyticsBackground';
 
 export default function AnalyticsPage() {
+  const categoryScores = useSkillCategoryScore();
+
   // サンプルデータ（実際のAPIから取得する場合はuseStateとuseEffectを使用）
   const githubStats = {
     totalRepos: 45,
@@ -441,6 +445,87 @@ export default function AnalyticsPage() {
                   ))}
                 </div>
                 <span className="text-gray-600 dark:text-gray-300">More</span>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* カテゴリ別スキルスコアセクション */}
+        <section className="py-16 sm:py-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+          <div className="max-w-6xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-12 sm:mb-16"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                カテゴリ別スキルスコア
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                技術スタックとアウトプット実績をカテゴリ別に分析
+              </p>
+            </motion.div>
+
+            {/* カテゴリ別スキルスコアリスト */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto mb-12"
+            >
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+                  カテゴリ別スコア
+                </h3>
+                <div className="grid gap-4">
+                  {categoryScores.map((cat, index) => (
+                    <motion.div
+                      key={cat.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="flex justify-between items-center py-4 px-6 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      <div>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {cat.name}
+                        </span>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {cat.github.commits + cat.qiita.posts}{' '}
+                          件のアウトプット
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {cat.total.toFixed(1)}
+                        </span>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          ポイント
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* カテゴリスコアグラフ */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+                  スキルスコア分布
+                </h3>
+                <SkillScoreChart />
               </div>
             </motion.div>
           </div>

@@ -1,6 +1,6 @@
 packages:
-  - backend
-  - frontend
+  - admin/backend
+  - admin/frontend
   - portfolio
 ignoredBuiltDependencies:
   - '@nestjs/core'

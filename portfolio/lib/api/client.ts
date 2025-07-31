@@ -44,29 +44,59 @@ async function apiRequest<T>(
   }
 }
 
+import { mockArticles, mockSlides } from './mockData';
+
 // 記事関連のAPI
 export const articlesApi = {
   // 記事一覧を取得
-  getAll: (): Promise<Article[]> => {
-    return apiRequest<Article[]>('/articles');
+  getAll: async (): Promise<Article[]> => {
+    try {
+      return await apiRequest<Article[]>('/articles');
+    } catch (error) {
+      console.warn('API接続に失敗しました。モックデータを使用します:', error);
+      return mockArticles;
+    }
   },
 
   // 記事詳細を取得
-  getById: (id: number): Promise<Article> => {
-    return apiRequest<Article>(`/articles/${id}`);
+  getById: async (id: number): Promise<Article> => {
+    try {
+      return await apiRequest<Article>(`/articles/${id}`);
+    } catch (error) {
+      console.warn('API接続に失敗しました。モックデータを使用します:', error);
+      const mockArticle = mockArticles.find((article) => article.id === id);
+      if (!mockArticle) {
+        throw new ApiError('記事が見つかりません', 404);
+      }
+      return mockArticle;
+    }
   },
 };
 
 // スライド関連のAPI
 export const slidesApi = {
   // スライド一覧を取得
-  getAll: (): Promise<Slide[]> => {
-    return apiRequest<Slide[]>('/slides');
+  getAll: async (): Promise<Slide[]> => {
+    try {
+      return await apiRequest<Slide[]>('/slides');
+    } catch (error) {
+      console.warn('API接続に失敗しました。モックデータを使用します:', error);
+      return mockSlides;
+    }
   },
 
   // スライド詳細を取得
-  getById: (id: number): Promise<Slide> => {
-    return apiRequest<Slide>(`/slides/${id}`);
+  getById: async (id: number): Promise<Slide> => {
+    try {
+      return await apiRequest<Slide>(`/slides/${id}`);
+    } catch (error) {
+      console.warn('API接続に失敗しました。モックデータを使用します:', error);
+      const mockSlide = mockSlides.find((slide) => slide.id === id);
+      if (!mockSlide) {
+        throw new ApiError('スライドが見つかりません', 404);
+      }
+      return mockSlide;
+    }
   },
 };
 

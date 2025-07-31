@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { usePortfolioData } from '../hooks/usePortfolioData';
+import { mockProjects } from '../../lib/api/mockData';
 
 interface Project {
   id: string;
@@ -12,6 +13,9 @@ interface Project {
   tags: string[];
   link: string;
   github?: string;
+  category?: string;
+  status?: string;
+  period?: string;
 }
 
 export default function HighlightsSection() {
@@ -19,26 +23,9 @@ export default function HighlightsSection() {
 
   // 動的プロジェクトデータを生成
   const dynamicHighlights: Project[] = [
-    {
-      id: 'outpilot',
-      title: 'Outpilot',
-      description:
-        'AIを活用した学習支援ツール。チャット形式で記事やスライドを作成し、Qiita投稿やポートフォリオ表示まで一気通貫で管理できます。',
-      image: '/api/placeholder/400/250',
-      tags: ['Next.js', 'TypeScript', 'OpenAI', 'Prisma'],
-      link: '/projects',
-      github: 'https://github.com/yourusername/outpilot',
-    },
-    {
-      id: 'portfolio',
-      title: 'ポートフォリオサイト',
-      description:
-        'モダンなデザインとアニメーションを採用した個人ポートフォリオサイト。技術力とアウトプット力をアピール。',
-      image: '/api/placeholder/400/250',
-      tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
-      link: '/',
-      github: 'https://github.com/yourusername/portfolio',
-    },
+    // 固定プロジェクト（モックデータから取得）
+    ...mockProjects,
+    // 最新記事（動的）
     ...(recentArticles.length > 0
       ? [
           {
@@ -48,9 +35,12 @@ export default function HighlightsSection() {
             image: '/api/placeholder/400/250',
             tags: ['技術記事', 'Qiita'],
             link: recentArticles[0]?.qiitaUrl || '/projects',
+            category: '技術記事',
+            status: '公開済み',
           },
         ]
       : []),
+    // 最新スライド（動的）
     ...(recentSlides.length > 0
       ? [
           {
@@ -60,6 +50,8 @@ export default function HighlightsSection() {
             image: '/api/placeholder/400/250',
             tags: ['プレゼンテーション', 'Marp'],
             link: '/projects',
+            category: 'プレゼンテーション',
+            status: '公開済み',
           },
         ]
       : []),
@@ -134,13 +126,38 @@ export default function HighlightsSection() {
 
                     {/* プロジェクト情報 */}
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {project.title}
-                      </h3>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {project.title}
+                        </h3>
+                        {project.category && (
+                          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
+                            {project.category}
+                          </span>
+                        )}
+                      </div>
 
                       <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                         {project.description}
                       </p>
+
+                      {/* ステータスと期間 */}
+                      {(project.status || project.period) && (
+                        <div className="flex items-center gap-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
+                          {project.status && (
+                            <span className="flex items-center">
+                              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                              {project.status}
+                            </span>
+                          )}
+                          {project.period && (
+                            <span className="flex items-center">
+                              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                              {project.period}
+                            </span>
+                          )}
+                        </div>
+                      )}
 
                       {/* タグ */}
                       <div className="flex flex-wrap gap-2 mb-6">

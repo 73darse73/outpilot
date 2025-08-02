@@ -9,9 +9,13 @@ import HighlightsSection from './components/HighlightsSection';
 import CTASection from './components/CTASection';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
+// import ThreeBackground from './components/ThreeBackground';
+import { useSkillCategoryScore } from './hooks/useSkillCategoryScore';
+import SkillScoreChart from './components/SkillScoreChart';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
+  const categoryScores = useSkillCategoryScore();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -34,6 +38,27 @@ export default function Home() {
         <HighlightsSection />
         <CTASection />
         <Footer />
+
+        {/* スキルカテゴリスコアリスト */}
+        <section className="max-w-2xl mx-auto mt-12 p-6 bg-white dark:bg-gray-900 rounded-xl shadow">
+          <h2 className="text-2xl font-bold mb-4">カテゴリ別スキルスコア</h2>
+          <ul>
+            {categoryScores.map((cat) => (
+              <li
+                key={cat.name}
+                className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+              >
+                <span className="font-semibold">{cat.name}</span>
+                <span className="text-blue-600 dark:text-blue-300 font-mono">
+                  {cat.total.toFixed(2)} 点
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* カテゴリスコアグラフ */}
+        <SkillScoreChart />
       </main>
     </PageTransition>
   );

@@ -30,7 +30,15 @@ export default function ArticlesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">記事一覧</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">記事一覧</h1>
+        <Link
+          href="/articles/new"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          新規作成
+        </Link>
+      </div>
 
       {/* フィルター */}
       <div className="flex gap-4 mb-8">

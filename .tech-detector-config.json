@@ -1,0 +1,28 @@
+{
+  "enabledTechnologies": [
+    "react",
+    "typescript",
+    "nextjs",
+    "tailwindcss",
+    "framer-motion",
+    "nodejs",
+    "nestjs",
+    "prisma",
+    "docker",
+    "aws"
+  ],
+  "customPatterns": {
+    "my-custom-lib": [
+      "/import.*my-custom-lib/",
+      "/from ['\"]my-custom-lib['\"]/"
+    ]
+  },
+  "excludePatterns": [
+    "/\\/\\/.*TODO/",
+    "/\\/\\/.*FIXME/",
+    "/console\\.log\\(.*\\)/"
+  ],
+  "confidenceThreshold": 2,
+  "autoConfirm": false,
+  "showDetectionDetails": true
+}

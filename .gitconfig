@@ -1,0 +1,12 @@
+[alias]
+  # 技術タグ付きコミット
+  commit-tech = "!f() { ./scripts/commit-with-tech.sh \"$1\"; }; f"
+  
+  # 技術タグを手動で追加
+  commit-with = "!f() { git commit -m \"$1 $2\"; }; f"
+  
+  # 技術タグのみを検出
+  detect-tech = "!f() { node scripts/auto-tech-detector.js; }; f"
+  
+  # コミット履歴で技術タグを表示
+  log-tech = "!f() { git log --oneline | grep -E '\\[.*\\]'; }; f" 

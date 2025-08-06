@@ -6,15 +6,22 @@ import Footer from '../components/Footer';
 import TitleBackground from '../components/TitleBackground';
 import PageTransition from '../components/PageTransition';
 import { useSkillCategoryScore } from '../hooks/useSkillCategoryScore';
+import { useGitHubData, analyzeGitHubStats } from '../hooks/useGitHubData';
 import SkillScoreChart from '../components/SkillScoreChart';
-// import AnalyticsBackground from '../components/AnalyticsBackground';
 
 export default function AnalyticsPage() {
   const categoryScores = useSkillCategoryScore();
 
-  // サンプルデータ（実際のAPIから取得する場合はuseStateとuseEffectを使用）
-  const githubStats = {
-    totalRepos: 45,
+  // GitHubデータを取得（実際のユーザー名に変更してください）
+  const {
+    data: githubStats,
+    loading: githubLoading,
+    error: githubError,
+  } = useGitHubData('73darse73');
+
+  // GitHubデータがない場合のフォールバック
+  const fallbackStats = {
+    totalRepositories: 45,
     totalStars: 128,
     totalCommits: 1250,
     totalFollowers: 89,
@@ -25,7 +32,16 @@ export default function AnalyticsPage() {
       { name: 'CSS', percentage: 10, color: '#1572B6' },
       { name: 'HTML', percentage: 10, color: '#E34F26' },
     ],
+    recentActivity: 15,
+    contributionData: Array.from({ length: 365 }, (_, i) => ({
+      date: new Date(2024, 0, 1 + i).toISOString().split('T')[0],
+      count: Math.floor(Math.random() * 10),
+    })),
   };
+
+  // 実際のGitHubデータまたはフォールバックデータを使用
+  const stats = githubStats || fallbackStats;
+  const analysis = githubStats ? analyzeGitHubStats(githubStats) : null;
 
   const monthlyOutput = [
     { month: '1月', articles: 3, slides: 2, projects: 1 },
@@ -52,11 +68,6 @@ export default function AnalyticsPage() {
     { name: 'Docker', usage: 50, trend: 'stable' },
     { name: 'PostgreSQL', usage: 65, trend: 'up' },
   ];
-
-  const contributionData = Array.from({ length: 365 }, (_, i) => ({
-    date: new Date(2024, 0, 1 + i),
-    count: Math.floor(Math.random() * 10),
-  }));
 
   return (
     <PageTransition>
@@ -101,6 +112,11 @@ export default function AnalyticsPage() {
               <p className="text-gray-600 dark:text-gray-300">
                 オープンソースへの貢献と開発活動の記録
               </p>
+              {githubError && (
+                <div className="mt-4 p-3 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg text-sm">
+                  ⚠️ {githubError} (モックデータを表示中)
+                </div>
+              )}
             </motion.div>
 
             {/* 統計カード */}
@@ -108,18 +124,18 @@ export default function AnalyticsPage() {
               {[
                 {
                   label: 'リポジトリ',
-                  value: githubStats.totalRepos,
+                  value: stats.totalRepositories,
                   icon: '📦',
                 },
-                { label: 'スター', value: githubStats.totalStars, icon: '⭐' },
+                { label: 'スター', value: stats.totalStars, icon: '⭐' },
                 {
                   label: 'コミット',
-                  value: githubStats.totalCommits,
+                  value: stats.totalCommits,
                   icon: '💻',
                 },
                 {
                   label: 'フォロワー',
-                  value: githubStats.totalFollowers,
+                  value: stats.totalFollowers,
                   icon: '👥',
                 },
               ].map((stat, index) => (
@@ -133,7 +149,7 @@ export default function AnalyticsPage() {
                 >
                   <div className="text-2xl sm:text-3xl mb-2">{stat.icon}</div>
                   <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                    {stat.value.toLocaleString()}
+                    {githubLoading ? '...' : stat.value.toLocaleString()}
                   </div>
                   <div className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
                     {stat.label}
@@ -141,6 +157,51 @@ export default function AnalyticsPage() {
                 </motion.div>
               ))}
             </div>
+
+            {/* アクティビティレベル表示 */}
+            {analysis && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                viewport={{ once: true }}
+                className="mb-8 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm"
+              >
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-center">
+                  アクティビティ分析
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {analysis.activityLevel === 'high'
+                        ? '🔥'
+                        : analysis.activityLevel === 'medium'
+                        ? '⚡'
+                        : '📈'}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      アクティビティ: {analysis.activityLevel}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {analysis.metrics.recentActivity}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      最近30日間のコミット
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      {analysis.popularityScore.toFixed(1)}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      人気度スコア
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* 言語使用率 */}
             <motion.div
@@ -155,7 +216,7 @@ export default function AnalyticsPage() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                 <div className="space-y-3 sm:space-y-4">
-                  {githubStats.languages.map((lang, index) => (
+                  {stats.languages.map((lang, index) => (
                     <motion.div
                       key={lang.name}
                       initial={{ opacity: 0, x: -30 }}
@@ -185,12 +246,12 @@ export default function AnalyticsPage() {
                       className="w-32 h-32 sm:w-48 sm:h-48 transform -rotate-90"
                       viewBox="0 0 100 100"
                     >
-                      {githubStats.languages.map((lang, index) => {
-                        const total = githubStats.languages.reduce(
+                      {stats.languages.map((lang, index) => {
+                        const total = stats.languages.reduce(
                           (sum, l) => sum + l.percentage,
                           0,
                         );
-                        const startAngle = githubStats.languages
+                        const startAngle = stats.languages
                           .slice(0, index)
                           .reduce(
                             (sum, l) => sum + (l.percentage / total) * 360,
@@ -404,7 +465,7 @@ export default function AnalyticsPage() {
               className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 sm:p-8 overflow-x-auto"
             >
               <div className="grid grid-cols-53 gap-1 min-w-max">
-                {contributionData.map((day, index) => (
+                {stats.contributionData.map((day, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, scale: 0 }}
@@ -422,9 +483,7 @@ export default function AnalyticsPage() {
                         ? 'bg-green-600 dark:bg-green-400'
                         : 'bg-green-800 dark:bg-green-200'
                     }`}
-                    title={`${day.date.toLocaleDateString()}: ${
-                      day.count
-                    } contributions`}
+                    title={`${day.date}: ${day.count} contributions`}
                   />
                 ))}
               </div>

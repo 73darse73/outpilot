@@ -1,6 +1,8 @@
 // スキル評価システム
 // 各項目の重み付けとスコア計算ロジック
 
+import { TechUsageData } from './github';
+
 export interface SkillScore {
   skillName: string;
   totalScore: number;
@@ -10,6 +12,7 @@ export interface SkillScore {
     slides: number;
     learning: number;
     community: number;
+    github: number; // GitHubデータを追加
   };
   rank: number;
   level: number; // 0-100
@@ -54,6 +57,14 @@ export interface CommunityMetrics {
   codeReviews: number;
 }
 
+export interface GitHubMetrics {
+  totalRepositories: number;
+  totalCommits: number;
+  techUsage: TechUsageData[];
+  mostUsedTechnologies: string[];
+  recentActivity: number;
+}
+
 // 重み付け設定（シンプル化）
 const WEIGHTS = {
   articles: {
@@ -83,6 +94,12 @@ const WEIGHTS = {
     followers: 0.1,
     connections: 0.2,
     codeReviews: 5,
+  },
+  github: {
+    totalRepositories: 5,
+    totalCommits: 0.1,
+    techUsage: 10, // 技術使用回数
+    recentActivity: 2,
   },
 };
 
@@ -200,6 +217,20 @@ export function calculateCommunityScore(metrics: CommunityMetrics): number {
   );
 }
 
+// GitHubスコア計算（新規追加）
+export function calculateGitHubScore(metrics: GitHubMetrics): number {
+  const techUsageScore = metrics.techUsage.reduce((total, tech) => {
+    return total + tech.usageCount * WEIGHTS.github.techUsage;
+  }, 0);
+
+  return (
+    metrics.totalRepositories * WEIGHTS.github.totalRepositories +
+    metrics.totalCommits * WEIGHTS.github.totalCommits +
+    techUsageScore +
+    metrics.recentActivity * WEIGHTS.github.recentActivity
+  );
+}
+
 // 総合スコア計算
 export function calculateTotalScore(
   articleScore: number,
@@ -207,9 +238,15 @@ export function calculateTotalScore(
   slideScore: number,
   learningScore: number,
   communityScore: number,
+  githubScore: number,
 ): number {
   return (
-    articleScore + projectScore + slideScore + learningScore + communityScore
+    articleScore +
+    projectScore +
+    slideScore +
+    learningScore +
+    communityScore +
+    githubScore
   );
 }
 
@@ -232,11 +269,65 @@ export function calculateTrend(
   return 'stable';
 }
 
+// GitHubデータからスキルメトリクスを生成
+export function generateSkillMetricsFromGitHub(githubData: {
+  commitTechnologies: TechUsageData[];
+  repositoryTechnologies: Map<string, string[]>;
+  totalRepositories: number;
+  totalCommits: number;
+  mostUsedTechnologies: string[];
+}): Map<
+  string,
+  {
+    usageCount: number;
+    lastUsed: string;
+    repositories: string[];
+    commits: number;
+  }
+> {
+  const skillMetrics = new Map();
+
+  // コミットから技術使用を分析
+  githubData.commitTechnologies.forEach((tech) => {
+    skillMetrics.set(tech.technology, {
+      usageCount: tech.usageCount,
+      lastUsed: tech.lastUsed,
+      repositories: tech.repositories,
+      commits: tech.commits,
+    });
+  });
+
+  // リポジトリの技術スタックも考慮
+  githubData.repositoryTechnologies.forEach((techs, repoName) => {
+    techs.forEach((tech) => {
+      const current = skillMetrics.get(tech) || {
+        usageCount: 0,
+        lastUsed: '',
+        repositories: [],
+        commits: 0,
+      };
+
+      current.usageCount += 1; // リポジトリでの使用
+      if (!current.repositories.includes(repoName)) {
+        current.repositories.push(repoName);
+      }
+
+      skillMetrics.set(tech, current);
+    });
+  });
+
+  return skillMetrics;
+}
+
 // カテゴリ別スキル研鑽の計算
 export function calculateCategoryBreakdown(
   articles: any[],
   projects: any[],
   slides: any[],
+  githubData?: {
+    commitTechnologies: TechUsageData[];
+    repositoryTechnologies: Map<string, string[]>;
+  },
 ): Map<string, number> {
   const categoryCount = new Map<string, number>();
 
@@ -267,11 +358,29 @@ export function calculateCategoryBreakdown(
     });
   });
 
+  // GitHubデータからカテゴリを抽出
+  if (githubData) {
+    githubData.commitTechnologies.forEach((tech) => {
+      const category = mapTagToCategory(tech.technology);
+      categoryCount.set(
+        category,
+        (categoryCount.get(category) || 0) + tech.usageCount,
+      );
+    });
+
+    githubData.repositoryTechnologies.forEach((techs) => {
+      techs.forEach((tech) => {
+        const category = mapTagToCategory(tech);
+        categoryCount.set(category, (categoryCount.get(category) || 0) + 1);
+      });
+    });
+  }
+
   return categoryCount;
 }
 
-// スキルランキング生成
-export function generateSkillRanking(
+// スキルランキング生成（GitHubデータ統合版）
+export function generateSkillRankingWithGitHub(
   skillData: {
     name: string;
     articleMetrics: ArticleMetrics;
@@ -279,6 +388,7 @@ export function generateSkillRanking(
     slideMetrics: SlideMetrics;
     learningMetrics: LearningMetrics;
     communityMetrics: CommunityMetrics;
+    githubMetrics?: GitHubMetrics;
   }[],
 ): SkillScore[] {
   return skillData
@@ -288,6 +398,9 @@ export function generateSkillRanking(
       const slideScore = calculateSlideScore(skill.slideMetrics);
       const learningScore = calculateLearningScore(skill.learningMetrics);
       const communityScore = calculateCommunityScore(skill.communityMetrics);
+      const githubScore = skill.githubMetrics
+        ? calculateGitHubScore(skill.githubMetrics)
+        : 0;
 
       const totalScore = calculateTotalScore(
         articleScore,
@@ -295,6 +408,7 @@ export function generateSkillRanking(
         slideScore,
         learningScore,
         communityScore,
+        githubScore,
       );
 
       // カテゴリを決定（最も活動が多いカテゴリ）
@@ -326,6 +440,7 @@ export function generateSkillRanking(
           slides: slideScore,
           learning: learningScore,
           community: communityScore,
+          github: githubScore,
         },
         rank: 0, // 後で設定
         level: calculateSkillLevel(totalScore),
@@ -385,5 +500,34 @@ export const defaultMetrics = {
     followers: 100,
     connections: 50,
     codeReviews: 10,
+  },
+  githubMetrics: {
+    totalRepositories: 10,
+    totalCommits: 500,
+    techUsage: [
+      {
+        technology: 'react',
+        usageCount: 50,
+        lastUsed: '2024-12-30',
+        repositories: ['repo1'],
+        commits: 50,
+      },
+      {
+        technology: 'typescript',
+        usageCount: 30,
+        lastUsed: '2024-12-29',
+        repositories: ['repo1'],
+        commits: 30,
+      },
+      {
+        technology: 'nextjs',
+        usageCount: 20,
+        lastUsed: '2024-12-28',
+        repositories: ['repo1'],
+        commits: 20,
+      },
+    ],
+    mostUsedTechnologies: ['react', 'typescript', 'nextjs'],
+    recentActivity: 10,
   },
 };

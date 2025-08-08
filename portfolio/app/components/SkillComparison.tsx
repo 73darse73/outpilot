@@ -29,16 +29,27 @@ const sampleComparisonData: ComparisonData[] = [
   { name: 'Node.js', userScore: 70, averageScore: 60, percentile: 75, trend: 'stable' },
   { name: 'Python', userScore: 60, averageScore: 70, percentile: 45, trend: 'down' },
   { name: 'AWS', userScore: 55, averageScore: 40, percentile: 78, trend: 'up' },
+  { name: 'Docker', userScore: 50, averageScore: 35, percentile: 82, trend: 'up' },
+  { name: 'PostgreSQL', userScore: 65, averageScore: 50, percentile: 80, trend: 'stable' },
 ];
 
 export default function SkillComparison({ userSkills }: SkillComparisonProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'score' | 'percentile' | 'trend'>('score');
 
+  // ユーザーのスキルデータとサンプルデータをマージ
+  const mergedData = sampleComparisonData.map(sample => {
+    const userSkill = userSkills.find(us => us.name === sample.name);
+    return {
+      ...sample,
+      userScore: userSkill ? userSkill.total : sample.userScore,
+    };
+  });
+
   // カテゴリ別にフィルタリング
   const filteredSkills = selectedCategory === 'all' 
-    ? sampleComparisonData 
-    : sampleComparisonData.filter(skill => {
+    ? mergedData 
+    : mergedData.filter(skill => {
         const userSkill = userSkills.find(us => us.name === skill.name);
         return userSkill?.category === selectedCategory;
       });
@@ -76,6 +87,19 @@ export default function SkillComparison({ userSkills }: SkillComparisonProps) {
     if (percentile >= 50) return 'text-yellow-600 dark:text-yellow-400';
     return 'text-red-600 dark:text-red-400';
   };
+
+  const getPercentileLabel = (percentile: number) => {
+    if (percentile >= 90) return 'エキスパート';
+    if (percentile >= 75) return '上級者';
+    if (percentile >= 50) return '中級者';
+    return '初級者';
+  };
+
+  const averagePercentile = sortedSkills.length > 0 
+    ? Math.round(sortedSkills.reduce((acc, skill) => acc + skill.percentile, 0) / sortedSkills.length)
+    : 0;
+
+  const topSkill = sortedSkills.length > 0 ? sortedSkills[0] : null;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -128,7 +152,7 @@ export default function SkillComparison({ userSkills }: SkillComparisonProps) {
                     {skill.name}
                   </h4>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    平均: {skill.averageScore}点
+                    平均: {skill.averageScore}点 | {getPercentileLabel(skill.percentile)}
                   </p>
                 </div>
               </div>
@@ -163,11 +187,11 @@ export default function SkillComparison({ userSkills }: SkillComparisonProps) {
                   <div className="relative h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
                     <div 
                       className="absolute h-2 bg-gray-400 dark:bg-gray-500 rounded-full"
-                      style={{ width: `${(skill.averageScore / 100) * 100}%` }}
+                      style={{ width: `${Math.min(100, (skill.averageScore / 100) * 100)}%` }}
                     />
                     <div 
                       className="absolute h-2 bg-blue-500 rounded-full"
-                      style={{ width: `${(skill.userScore / 100) * 100}%` }}
+                      style={{ width: `${Math.min(100, (skill.userScore / 100) * 100)}%` }}
                     />
                   </div>
                 </div>
@@ -182,8 +206,8 @@ export default function SkillComparison({ userSkills }: SkillComparisonProps) {
           📊 分析結果
         </h4>
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          あなたのスキルは平均的な開発者と比較して、上位{Math.round(sortedSkills.reduce((acc, skill) => acc + skill.percentile, 0) / sortedSkills.length)}%のレベルです。
-          特に{Math.max(...sortedSkills.map(s => s.percentile))}%のスキルでは、業界トップクラスの実力を持っています。
+          あなたのスキルは平均的な開発者と比較して、上位{averagePercentile}%のレベルです。
+          {topSkill && `特に${topSkill.name}では${topSkill.percentile}%のスキルレベルで、業界トップクラスの実力を持っています。`}
         </p>
       </div>
     </div>

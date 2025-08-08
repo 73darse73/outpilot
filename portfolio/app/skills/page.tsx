@@ -8,6 +8,7 @@ import PageTransition from '../components/PageTransition';
 import { useSkillCategoryScore } from '../hooks/useSkillCategoryScore';
 import { useGitHubData, analyzeGitHubStats } from '../hooks/useGitHubData';
 import SkillScoreChart from '../components/SkillScoreChart';
+import SkillComparison from '../components/SkillComparison';
 
 export default function SkillsPage() {
   const categoryScores = useSkillCategoryScore();
@@ -75,6 +76,15 @@ export default function SkillsPage() {
     return acc;
   }, {} as Record<string, any[]>);
 
+  // スキル比較用のデータを準備
+  const userSkillsForComparison = categoryScores.map(skill => ({
+    name: skill.name,
+    total: skill.total,
+    color: getSkillColor(skill.name),
+    icon: getSkillIcon(skill.name),
+    category: getSkillCategory(skill.name),
+  }));
+
   return (
     <PageTransition>
       <main className="min-h-screen bg-transparent">
@@ -130,7 +140,7 @@ export default function SkillsPage() {
           </section>
         )}
 
-        {/* カテゴリ別スキル表示 */}
+        {/* スキル比較セクション */}
         <section className="py-16 sm:py-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
           <div className="max-w-6xl mx-auto px-4">
             <motion.div
@@ -141,10 +151,39 @@ export default function SkillsPage() {
               className="text-center mb-12 sm:mb-16"
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                カテゴリ別スキル
+                スキル比較分析
               </h2>
               <p className="text-gray-600 dark:text-gray-300">
-                技術領域ごとのスキルレベルと実績
+                他の開発者とのスキルレベルを比較して、自分の強みと改善点を把握
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <SkillComparison userSkills={userSkillsForComparison} />
+            </motion.div>
+          </div>
+        </section>
+
+        {/* カテゴリ別スキル表示 */}
+        <section className="py-16 sm:py-20 bg-transparent">
+          <div className="max-w-6xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-12 sm:mb-16"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                カテゴリ別スキル詳細
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                技術カテゴリごとの詳細なスキル分析とスコア
               </p>
             </motion.div>
 
@@ -240,120 +279,7 @@ export default function SkillsPage() {
           </div>
         </section>
 
-        {/* GitHub分析セクション */}
-        {analysis && (
-          <section className="py-16 sm:py-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-            <div className="max-w-6xl mx-auto px-4">
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className="text-center mb-12 sm:mb-16"
-              >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                  GitHub分析
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300">
-                  開発活動の詳細分析
-                </p>
-              </motion.div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center shadow-sm"
-                >
-                  <div className="text-3xl mb-2">
-                    {analysis.activityLevel === 'high'
-                      ? '🔥'
-                      : analysis.activityLevel === 'medium'
-                      ? '⚡'
-                      : '📈'}
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    アクティビティレベル
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 capitalize">
-                    {analysis.activityLevel}
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center shadow-sm"
-                >
-                  <div className="text-3xl mb-2">📊</div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    最近の活動
-                  </h3>
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {analysis.metrics.recentActivity}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    30日間のコミット
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  viewport={{ once: true }}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center shadow-sm"
-                >
-                  <div className="text-3xl mb-2">⭐</div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    人気度スコア
-                  </h3>
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {analysis.popularityScore.toFixed(1)}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    スター/フォロワー比
-                  </p>
-                </motion.div>
-              </div>
-
-              {/* 主要技術 */}
-              {analysis.topLanguages.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  viewport={{ once: true }}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm"
-                >
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
-                    主要技術スタック
-                  </h3>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    {analysis.topLanguages.map((lang, index) => (
-                      <motion.span
-                        key={lang.name}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                        viewport={{ once: true }}
-                        className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"
-                      >
-                        {lang.name} ({lang.percentage}%)
-                      </motion.span>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* スキルスコアグラフ */}
+        {/* スキルスコア分布 */}
         <section className="py-16 sm:py-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
           <div className="max-w-6xl mx-auto px-4">
             <motion.div

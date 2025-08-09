@@ -6,13 +6,10 @@ import { usePortfolioData } from '../hooks/usePortfolioData';
 interface SkillRanking {
   rank: number;
   name: string;
-  level: number;
   points: number;
   color: string;
   icon: string;
   category: 'main' | 'other';
-  usageCount: number;
-  lastUsed: Date;
 }
 
 // スキル情報のマッピング
@@ -48,14 +45,7 @@ const getSkillIcon = (name: string): string => {
   return skillInfo[name as keyof typeof skillInfo]?.icon || '💻';
 };
 
-// レベル定義（実績ベース）
-const getSkillLevel = (points: number) => {
-  if (points >= 1500) return { name: 'エキスパート', level: 4, color: 'from-purple-600 to-pink-600' };
-  if (points >= 800) return { name: '上級', level: 3, color: 'from-blue-600 to-purple-600' };
-  if (points >= 400) return { name: '中級', level: 2, color: 'from-green-600 to-blue-600' };
-  if (points >= 150) return { name: '基礎', level: 1, color: 'from-yellow-500 to-green-600' };
-  return { name: '学習中', level: 0, color: 'from-gray-500 to-yellow-500' };
-};
+
 
 // スキル使用頻度を計算してポイントに変換
 const calculateSkillUsage = (data: { recentArticles: any[]; recentSlides: any[] }): SkillRanking[] => {
@@ -92,11 +82,8 @@ const calculateSkillUsage = (data: { recentArticles: any[]; recentSlides: any[] 
     .map(([name, points]) => ({
       name,
       points,
-      level: getSkillLevel(points).level,
       color: getSkillColor(name),
       icon: getSkillIcon(name),
-      usageCount: Math.floor(points / 20),
-      lastUsed: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
       rank: 0,
       category: 'main' as const,
     }))
@@ -146,9 +133,7 @@ export default function SimpleSkillsSection() {
 
         {/* トップ6スキル */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {topSkills.map((skill, index) => {
-            const levelInfo = getSkillLevel(skill.points);
-            return (
+          {topSkills.map((skill, index) => (
               <motion.div
                 key={skill.name}
                 initial={{ opacity: 0, y: 30 }}
@@ -171,9 +156,6 @@ export default function SimpleSkillsSection() {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {skill.name}
                     </h3>
-                    <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium text-white bg-gradient-to-r ${levelInfo.color}`}>
-                      {levelInfo.name}
-                    </div>
                   </div>
                 </div>
 
@@ -189,16 +171,9 @@ export default function SimpleSkillsSection() {
 
                 </div>
 
-                {/* 使用統計 */}
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex justify-between">
-                    <span>使用回数</span>
-                    <span>{skill.usageCount}回</span>
-                  </div>
-                </div>
+
               </motion.div>
-            );
-          })}
+          ))}
         </div>
       </div>
     </section>

@@ -48,14 +48,13 @@ const getSkillIcon = (name: string): string => {
   return skillInfo[name as keyof typeof skillInfo]?.icon || '💻';
 };
 
-// レベル定義
+// レベル定義（実績ベース）
 const getSkillLevel = (points: number) => {
-  if (points >= 2000) return { name: 'マスター', level: 5, color: 'from-red-500 to-pink-500' };
-  if (points >= 1000) return { name: 'エキスパート', level: 4, color: 'from-orange-500 to-red-500' };
-  if (points >= 600) return { name: '上級', level: 3, color: 'from-purple-500 to-orange-500' };
-  if (points >= 300) return { name: '中級', level: 2, color: 'from-blue-500 to-purple-500' };
-  if (points >= 100) return { name: '基礎', level: 1, color: 'from-green-500 to-blue-500' };
-  return { name: '初心者', level: 0, color: 'from-gray-400 to-green-500' };
+  if (points >= 1500) return { name: 'エキスパート', level: 4, color: 'from-purple-600 to-pink-600' };
+  if (points >= 800) return { name: '上級', level: 3, color: 'from-blue-600 to-purple-600' };
+  if (points >= 400) return { name: '中級', level: 2, color: 'from-green-600 to-blue-600' };
+  if (points >= 150) return { name: '基礎', level: 1, color: 'from-yellow-500 to-green-600' };
+  return { name: '学習中', level: 0, color: 'from-gray-500 to-yellow-500' };
 };
 
 // スキル使用頻度を計算してポイントに変換
@@ -130,7 +129,7 @@ export default function SimpleSkillsSection() {
             技術スタックランキング
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4">
-            実際のアウトプットから算出したスキルポイントランキング
+            記事・スライド・プロジェクトの実績から算出した客観的スコア
           </p>
           <motion.a
             href="/analytics"
@@ -187,26 +186,7 @@ export default function SimpleSkillsSection() {
                     </span>
                   </div>
                   
-                  {/* 次のレベルまでのプログレス */}
-                  {levelInfo.level < 5 && (
-                    <div className="mt-2">
-                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        <span>次のレベルまで</span>
-                        <span>{getSkillLevel([2000, 1000, 600, 300, 100][4 - levelInfo.level] || 100).name}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <motion.div
-                          className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-                          initial={{ width: 0 }}
-                          whileInView={{ 
-                            width: `${Math.min(100, (skill.points / ([2000, 1000, 600, 300, 100][4 - levelInfo.level] || 100)) * 100)}%` 
-                          }}
-                          transition={{ duration: 1, delay: index * 0.1 }}
-                          viewport={{ once: true }}
-                        />
-                      </div>
-                    </div>
-                  )}
+
                 </div>
 
                 {/* 使用統計 */}

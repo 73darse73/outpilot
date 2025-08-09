@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import LoadingScreen from './components/LoadingScreen';
 import HeroSection from './components/HeroSection';
-import SkillsSection from './components/SkillsSection';
+import SimpleSkillsSection from './components/SimpleSkillsSection';
 import HighlightsSection from './components/HighlightsSection';
 import CTASection from './components/CTASection';
 import Footer from './components/Footer';
@@ -34,7 +34,7 @@ export default function Home() {
         {isLoading && <LoadingScreen />}
         <Navigation />
         <HeroSection />
-        <SkillsSection />
+        <SimpleSkillsSection />
         <HighlightsSection />
         <CTASection />
         <Footer />
